@@ -3,16 +3,7 @@
 [![License](https://img.shields.io/github/license/Virtlink/refret-eclipse-testcase-generator)](https://github.com/Virtlink/refret-eclipse-testcase-generator/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/Virtlink/myapp)](https://github.com/Virtlink/myapp/releases)
 
-This is an opinionated template for Kotlin JVM applications, using the latest Gradle and Kotlin.
-
-This repository contains a root project `myapp-project`, a subproject `myapp`, and Github workflows for building and publishing the project as a package on Github Packages and on Maven Central.
-
-To make this application your own, find-and-replace the following terms:
-- `Virtlink` -> your GitHub username
-- `com.example` -> the project's group
-- `myapp` -> the project's name
-Also, replace the license at the bottom of this file and in the `LICENSE` file.
-
+Generates SPT test cases from Eclipse unit tests for the Reference Retention paper.
 
 ## Quick Start
 To build the project:
