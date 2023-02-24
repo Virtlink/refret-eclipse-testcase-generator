@@ -20,9 +20,9 @@ allprojects {
 
     val gitVersion: groovy.lang.Closure<String> by extra
 
-    group = "com.example"
+    group = "net.pelsmaeker"
     version = gitVersion()
-    description = "myapp"
+    description = "refret-eclipse-testcase-generator"
 
     repositories {
         mavenCentral()

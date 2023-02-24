@@ -1,4 +1,3 @@
-rootProject.name = "myapp-project"
+rootProject.name = "refret-eclipse-testcase-generator-project"
 
-include(":myapp")
-include(":mylib")
+include(":generator")

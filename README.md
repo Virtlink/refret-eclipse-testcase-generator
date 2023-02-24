@@ -1,7 +1,6 @@
 # Kotlin JVM Template
-[![Build](https://github.com/Virtlink/myapp/actions/workflows/build.yml/badge.svg)](https://github.com/Virtlink/myapp/actions)
-[![License](https://img.shields.io/github/license/Virtlink/myapp)](https://github.com/Virtlink/myapp/blob/main/LICENSE)
-[![Maven Release](https://img.shields.io/maven-central/v/com.example/myapp)](https://mvnrepository.com/artifact/com.example/myapp)
+[![Build](https://github.com/Virtlink/refret-eclipse-testcase-generator/actions/workflows/build.yml/badge.svg)](https://github.com/Virtlink/refret-eclipse-testcase-generator/actions)
+[![License](https://img.shields.io/github/license/Virtlink/refret-eclipse-testcase-generator)](https://github.com/Virtlink/refret-eclipse-testcase-generator/blob/main/LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/Virtlink/myapp)](https://github.com/Virtlink/myapp/releases)
 
 This is an opinionated template for Kotlin JVM applications, using the latest Gradle and Kotlin.
