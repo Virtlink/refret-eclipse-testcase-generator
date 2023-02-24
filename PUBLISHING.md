@@ -45,26 +45,6 @@ gpr.key=ghp_BRW0dchXpF3QH5c5JJuGhXrgN9SHM1fMrVP4
 ```
 
 
-### OSSRH Maven Central
-The OSSRH username and token can be found as follows:
-
-1. Login into https://oss.sonatype.org/
-2. Click your username in the top-right, go to Profile.
-3. In the drop-down box, change from Summary to User Token.
-4. Click the Access User Token button. It will give a username and token.
-
-In the `~/gradle.properties` file in your _home_ directory, add those values as the following properties:
-```properties
-# OSSRH Maven Central
-ossrh.user=bYpE4FzT
-ossrh.token=T33RJJMfxWPlvKhA7pp9izcsgpwbA4FBY3hMoH3+bdk5
-```
-On the [repository settings Secrets page](https://github.com/Virtlink/myapp/settings/secrets/actions), add those values as the following secrets:
-
-- `OSSRH_USERNAME`: The OSSRH token username, e.g., `bYpE4FzT`
-- `OSSRH_TOKEN`: The OSSRH token, e.g., `T33RJJMfxWPlvKhA7pp9izcsgpwbA4FBY3hMoH3+bdk5`
-
-
 ## Automatic Publishing
 Automatic publishing is preferred over manual publishing. To publish a new version of the library automatically using GitHub Actions, follow these steps:
 
@@ -89,19 +69,6 @@ To publish a new version of the library manually from the command-line, follow t
 ```shell
 ./gradlew publish
 ```
-
-
-## Releasing the Artifact
-After publishing, the artifact must be released manually from Maven Central. To do so, follow these steps:
-1.  Login into OSSRH at [s01.oss.sonatype.org](https://s01.oss.sonatype.org/)
-2.  Go to 'Staging Repositories' on the left, click the 'Refresh' button at the top to see the repositories.
-3.  Select the repository, and click the 'Close' button at the top.
-    This will validate the package requirements. Wait for it to complete,
-    by periodically clicking the 'Refresh' button at the top.
-4.  Once successfully closed, click the 'Release' button to publish the package on Maven Central.
-    The repository may be dropped after release. Again, wait for the operation to complete.
-5.  Done! It can take a while for the new release to appear on Maven Central at:
-    <https://search.maven.org/artifact/com.example/myapp>
 
 
 ## Update Documentation

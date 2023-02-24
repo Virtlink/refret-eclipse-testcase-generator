@@ -35,12 +35,9 @@ jobs:
             -Psigning.password=${{ secrets.SIGNING_KEY_PASSWORD }}
             -Psigning.secretKeyRingFile=/home/runner/secring.gpg
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release on GitHub
         uses: softprops/action-gh-release@v1
         with:
           name: "Release ${{ github.ref_name }}"
-          files: "**/build/libs/myapp-${{ github.ref_name }}*"
           fail_on_unmatched_files: true
