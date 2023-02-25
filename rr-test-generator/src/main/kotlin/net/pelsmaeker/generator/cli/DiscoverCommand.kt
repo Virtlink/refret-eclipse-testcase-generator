@@ -41,8 +41,8 @@ class DiscoverCommand: CliktCommand(
         // Write each Java project out as a SPT test suite file
         Cli.info("Generating test suite files in: $output")
         for (javaProject in javaProjects) {
-            TestSuiteGenerator.writeToFile(javaProject, output)
-            Cli.info("Generated test suite file for: ${javaProject.name}")
+            val dest = TestSuiteGenerator.writeToFile(javaProject, output)
+            Cli.info("Wrote test suite for ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier} to: $dest")
         }
         Cli.info("Generated ${javaProjects.size} test suite files.")
 

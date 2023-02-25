@@ -8,6 +8,6 @@ package net.pelsmaeker.generator.cli
 fun main(args: Array<String>) {
     Cli(
         DiscoverCommand(),
-        GenerateSptTestsCommand(),
+        GenerateCommand(),
     ).main(args)
 }

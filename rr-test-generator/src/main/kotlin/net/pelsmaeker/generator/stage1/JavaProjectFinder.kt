@@ -50,7 +50,8 @@ object JavaProjectFinder {
             Cli.error("Test suite name could not be determined from file, skipped: $file")
             return null
         }
-        val (unitName, testSuiteName, testSuiteQualifier) = testSuiteNames
+        val (unitName, testName, testQualifier) = testSuiteNames
+
         val text = file.readText()
         val packageName = getPackageName(text)
         if (packageName == null) {
@@ -58,28 +59,27 @@ object JavaProjectFinder {
             return null
         }
 
-        val testName = root.relativize(file).joinToString("_") + "_" + testSuiteName + "_" + testSuiteQualifier
+        val pathComponents = root.relativize(file).map { it.toString() }.toList()
+        val testDir = pathComponents.dropLast(1).joinToString("/")
 
         return JavaProject(
             testName,
-            listOf(
-                JavaPackage(
+            testQualifier,
+            testDir,
+            listOf(JavaPackage(
                     packageName,
-                    listOf(
-                        JavaUnit(
-                        unitName,
-                        text,
-                    )
-                    )
-                )
-            )
+                    listOf(JavaUnit(
+                            unitName,
+                            text,
+                    ))
+            ))
         )
     }
 
     /**
      * Reads a Java project from the files in a directory, such as an `out` directory.
      *
-     * @param directory the directory path
+     * @param directory the directory path, ending with a directory such as `out`
      * @param root the root path relative to which the name of the test is determined
      * @return the Java project
      */
@@ -98,10 +98,15 @@ object JavaProjectFinder {
             unitsInPackage.add(JavaUnit(javaFile.fileName.nameWithoutExtension, text))
         }
 
-        val testName = root.relativize(directory).joinToString("_")
+        val pathComponents = root.relativize(directory).map { it.toString() }.toList()
+        val testDir = pathComponents.dropLast(2).joinToString("/")
+        val testName = pathComponents.dropLast(1).last()
+        val testQualifier = pathComponents.last()
 
         return JavaProject(
             testName,
+            testQualifier,
+            testDir,
             packages.map { (packageName, units) ->
                 JavaPackage(packageName, units)
             }

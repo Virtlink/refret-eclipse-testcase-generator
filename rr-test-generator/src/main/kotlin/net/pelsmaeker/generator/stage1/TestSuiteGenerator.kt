@@ -1,6 +1,7 @@
 package net.pelsmaeker.generator.stage1
 
 import java.io.Writer
+import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.bufferedWriter
 
@@ -11,11 +12,17 @@ object TestSuiteGenerator {
 
     /**
      * Writes the Java project as a Test suite in the specified directory.
+     *
+     * @return the path to which the file was written
      */
-    fun writeToFile(javaProject: JavaProject, outputDirectory: Path) {
-        outputDirectory.resolve(javaProject.name).bufferedWriter().use { writer ->
+    fun writeToFile(javaProject: JavaProject, outputDirectory: Path): Path {
+        val testDir = outputDirectory.resolve(javaProject.directory)
+        Files.createDirectories(testDir)
+        val destinationPath = testDir.resolve(javaProject.name + "_" + javaProject.qualifier + ".java")
+        destinationPath.bufferedWriter().use { writer ->
             generate(javaProject.packages, writer)
         }
+        return destinationPath
     }
 
     /**
