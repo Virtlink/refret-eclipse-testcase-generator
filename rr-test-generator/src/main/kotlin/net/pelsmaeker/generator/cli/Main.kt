@@ -10,7 +10,7 @@ import com.github.ajalt.clikt.core.subcommands
  */
 fun main(args: Array<String>) {
     MainCommand().subcommands(
-        GenerateSuitesCommand(),
+        DiscoverCommand(),
         GenerateSptTestsCommand(),
     ).main(args)
 }
