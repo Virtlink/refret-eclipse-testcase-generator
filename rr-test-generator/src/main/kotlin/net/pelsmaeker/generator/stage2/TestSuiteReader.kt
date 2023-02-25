@@ -15,7 +15,7 @@ import net.pelsmaeker.generator.utils.replaceAll
  * If the expected name is omitted, it is assumed to be equal to the input name. Whitespace around the names or code is
  * ignored. For example, `[[->1|foo|B.foo]]` is a reference to the declaration `[[1|foo]]` in class `B`.
  */
-class TestSuiteReader {
+object TestSuiteReader {
 
     private val regex = Regex("""\[\[([^|\]]+)\|([^|\]]+)(?:\|([^|\]]+))?\]\]""")
 
@@ -28,10 +28,12 @@ class TestSuiteReader {
      * qualified) name of the reference, and `expected` is the expected qualified name of the reference.
      *
      * @param name the test suite name
+     * @param name the test suite qualifier; or `null`
+     * @param directory the test suite directory
      * @param text the text with markers
      * @return the test suite
      */
-    fun readTestSuite(name: String, text: String): TestSuite {
+    fun readTestSuite(name: String, qualifier: String?, directory: String, text: String): TestSuite {
         val refs = mutableListOf<Ref>()
         val decls = mutableListOf<Decl>()
 
@@ -72,6 +74,8 @@ class TestSuiteReader {
 
         return TestSuite(
             name = name,
+            qualifier = qualifier,
+            directory = directory,
             expectedText = expectedText,
             identifiers = ids,
             cases = cases,

@@ -1,12 +1,33 @@
 package net.pelsmaeker.generator.stage2
 
+import net.pelsmaeker.generator.stage1.JavaProject
+import net.pelsmaeker.generator.stage1.TestSuiteGenerator
 import net.pelsmaeker.generator.utils.replaceAll
 import java.io.Writer
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.bufferedWriter
 
 /**
  * Generates a test case.
  */
-class SptTestGenerator {
+object SptTestGenerator {
+
+
+    /**
+     * Writes the test suite as a SPT test in the specified directory.
+     *
+     * @return the path to which the file was written
+     */
+    fun writeToFile(suite: TestSuite, outputDirectory: Path): Path {
+        val testDir = outputDirectory.resolve(suite.name)
+        Files.createDirectories(testDir)
+        val destinationPath = testDir.resolve(suite.name + (suite.qualifier?.let { "_$it" } ?: "") + ".spt")
+        destinationPath.bufferedWriter().use { writer ->
+            generate(suite, writer)
+        }
+        return destinationPath
+    }
 
     /**
      * Writes an SPT test file for the specific test.
@@ -89,7 +110,7 @@ class SptTestGenerator {
         val newText = suite.expectedText.replaceAll(orderedSelections, JavaId::range) { s, t, _ ->
             "[[${replacements[s] ?: t}]]"
         }
-        writeln(newText)
+        writeln(newText.trim())
     }
 
     /**

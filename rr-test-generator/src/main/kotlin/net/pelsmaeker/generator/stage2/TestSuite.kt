@@ -2,8 +2,12 @@ package net.pelsmaeker.generator.stage2
 
 /** A test suite. */
 data class TestSuite(
-    /** The test suite name, such as `MoveMembers/test41`. */
+    /** The test suite name, such as `testStaticImport5`. */
     val name: String,
+    /** The qualifier for the project, such as `out`; or `null`. */
+    val qualifier: String?,
+    /** The directory with the project, such as `RenameStaticMethod`. */
+    val directory: String,
     /** The expected text. */
     val expectedText: String,
     /** The declarations and references highlighted in the test; ordered from first to last. */

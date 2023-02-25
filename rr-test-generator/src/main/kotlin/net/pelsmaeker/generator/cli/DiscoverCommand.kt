@@ -17,7 +17,7 @@ class DiscoverCommand: CliktCommand(
     help = "Discovers Eclipse test files"
 ) {
 
-    /** The input path. This directory is searched for subdirectories and files. */
+    /** The input paths. These directories are searched for subdirectories and files. */
     private val inputs: List<Path> by argument(help="Directory with input directories and files")
         .path(mustExist = true, canBeFile = false, canBeDir = true, mustBeReadable = true)
         .multiple()
@@ -31,11 +31,12 @@ class DiscoverCommand: CliktCommand(
         val javaProjects = inputs.flatMap { input ->
             Cli.info("Finding test Java projects in: $input")
             val projects = JavaProjectFinder.findAllJavaProjects(input, input)
-            Cli.info("Found ${projects.size} test Java projects.")
             projects
         }
+        Cli.info("Found ${javaProjects.size} test Java projects.")
 
         // Ensure the output directory exists
+        Cli.info("Creating output directory: $output")
         Files.createDirectories(output)
 
         // Write each Java project out as a SPT test suite file
