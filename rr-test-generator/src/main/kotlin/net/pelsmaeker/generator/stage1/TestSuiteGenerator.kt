@@ -1,9 +1,12 @@
 package net.pelsmaeker.generator.stage1
 
+import net.pelsmaeker.generator.utils.overwritingBufferedWriter
 import net.pelsmaeker.generator.utils.writeln
 import java.io.Writer
 import java.nio.file.Files
+import java.nio.file.OpenOption
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 import kotlin.io.path.bufferedWriter
 
 /**
@@ -16,11 +19,11 @@ object TestSuiteGenerator {
      *
      * @return the path to which the file was written
      */
-    fun writeToFile(javaProject: JavaProject, outputDirectory: Path): Path {
+    fun writeToFile(javaProject: JavaProject, outputDirectory: Path, force: Boolean): Path {
         val testDir = outputDirectory.resolve(javaProject.directory)
         Files.createDirectories(testDir)
         val destinationPath = testDir.resolve(javaProject.name + "_" + javaProject.qualifier + ".java")
-        destinationPath.bufferedWriter().use { writer ->
+        destinationPath.overwritingBufferedWriter(force).use { writer ->
             generate(javaProject.packages, writer)
         }
         return destinationPath
@@ -47,3 +50,4 @@ object TestSuiteGenerator {
     }
 
 }
+

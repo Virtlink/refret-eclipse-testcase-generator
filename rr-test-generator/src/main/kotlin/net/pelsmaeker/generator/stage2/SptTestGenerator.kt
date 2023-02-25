@@ -2,6 +2,7 @@ package net.pelsmaeker.generator.stage2
 
 import net.pelsmaeker.generator.stage1.JavaProject
 import net.pelsmaeker.generator.stage1.TestSuiteGenerator
+import net.pelsmaeker.generator.utils.overwritingBufferedWriter
 import net.pelsmaeker.generator.utils.replaceAll
 import net.pelsmaeker.generator.utils.writeln
 import java.io.Writer
@@ -20,11 +21,11 @@ object SptTestGenerator {
      *
      * @return the path to which the file was written
      */
-    fun writeToFile(suite: TestSuite, outputDirectory: Path): Path {
+    fun writeToFile(suite: TestSuite, outputDirectory: Path, force: Boolean): Path {
         val testDir = outputDirectory.resolve(suite.directory)
         Files.createDirectories(testDir)
         val destinationPath = testDir.resolve(suite.name + ".spt")
-        destinationPath.bufferedWriter().use { writer ->
+        destinationPath.overwritingBufferedWriter(force).use { writer ->
             generate(suite, writer)
         }
         return destinationPath

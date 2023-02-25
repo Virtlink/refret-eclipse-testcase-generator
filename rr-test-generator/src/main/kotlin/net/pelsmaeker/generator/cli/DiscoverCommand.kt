@@ -3,6 +3,7 @@ package net.pelsmaeker.generator.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
@@ -21,10 +22,15 @@ class DiscoverCommand: CliktCommand(
     private val inputs: List<Path> by argument(help="Directory with input directories and files")
         .path(mustExist = true, canBeFile = false, canBeDir = true, mustBeReadable = true)
         .multiple()
+
     /** The output path. This directory is used to create subdirectories and write the generated test suite files. */
     private val output: Path by option("-o", "--out", help="Directory for output directories and files")
         .path(mustExist = false, canBeFile = false, canBeDir = true)
         .required()
+
+    /** Whether to force overwriting existing generated files. */
+    private val force: Boolean by option("-f", "--force", help="Force overwrite of existing files")
+        .flag(default = false)
 
     override fun run() {
         // Gather all projects
@@ -42,7 +48,7 @@ class DiscoverCommand: CliktCommand(
         // Write each Java project out as a SPT test suite file
         Cli.info("Generating test suite files in: $output")
         for (javaProject in javaProjects) {
-            val dest = TestSuiteGenerator.writeToFile(javaProject, output)
+            TestSuiteGenerator.writeToFile(javaProject, output, force)
             Cli.info("  ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier}")
         }
         Cli.info("Generated ${javaProjects.size} test suite files.")
