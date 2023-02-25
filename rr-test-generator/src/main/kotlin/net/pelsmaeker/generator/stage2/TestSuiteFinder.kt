@@ -44,13 +44,10 @@ object TestSuiteFinder {
 
         val pathComponents = root.relativize(file).map { it.toString() }.toList()
         val testDir = pathComponents.dropLast(1).joinToString("/")
-        val testFileName = pathComponents.last().substringBeforeLast(".java")
-        val testName = testFileName.substringBeforeLast('_')
-        val testQualifier = testFileName.substringAfterLast('_', missingDelimiterValue = "").takeIf { it.isNotBlank() }
+        val testName = pathComponents.last().substringBeforeLast(".java")
 
         return TestSuiteReader.readTestSuite(
             testName,
-            testQualifier,
             testDir,
             content,
         )

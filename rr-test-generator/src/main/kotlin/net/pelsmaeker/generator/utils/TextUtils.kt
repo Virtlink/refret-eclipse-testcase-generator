@@ -1,5 +1,7 @@
 package net.pelsmaeker.generator.utils
 
+import java.io.Writer
+
 /**
  * Applies all replacements from the specified map of replacements to functions.
  *
@@ -24,3 +26,14 @@ fun <T> String.replaceAll(
         adjustment += newLength - oldLength
     }
 }.toString()
+
+
+/**
+ * Writes a line.
+ *
+ * @param text the line of text to write
+ */
+fun Writer.writeln(text: String = "") {
+    write(text)
+    write("\n")
+}

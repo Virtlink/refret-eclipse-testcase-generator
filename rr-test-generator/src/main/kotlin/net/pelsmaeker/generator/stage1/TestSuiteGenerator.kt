@@ -1,5 +1,6 @@
 package net.pelsmaeker.generator.stage1
 
+import net.pelsmaeker.generator.utils.writeln
 import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,25 +34,15 @@ object TestSuiteGenerator {
      */
     fun generate(packages: Iterable<JavaPackage>, writer: Writer): Unit = writer.run {
         writeln("test;")
-        writeln()
         packages.forEach { pkg ->
             writeln("[${pkg.name}] {")
             pkg.units.forEach { unit ->
                 writeln("[${unit.name}]")
-                writeln(unit.text)
+                write("  ")
+                writeln(unit.text.prependIndent("  "))
             }
             writeln("}")
         }
-    }
-
-    /**
-     * Writes a line.
-     *
-     * @param text the line of text to write
-     */
-    private fun Writer.writeln(text: String = "") {
-        write(text)
-        write("\n")
     }
 
 }

@@ -3,6 +3,7 @@ package net.pelsmaeker.generator.stage2
 import net.pelsmaeker.generator.stage1.JavaProject
 import net.pelsmaeker.generator.stage1.TestSuiteGenerator
 import net.pelsmaeker.generator.utils.replaceAll
+import net.pelsmaeker.generator.utils.writeln
 import java.io.Writer
 import java.nio.file.Files
 import java.nio.file.Path
@@ -20,9 +21,9 @@ object SptTestGenerator {
      * @return the path to which the file was written
      */
     fun writeToFile(suite: TestSuite, outputDirectory: Path): Path {
-        val testDir = outputDirectory.resolve(suite.name)
+        val testDir = outputDirectory.resolve(suite.directory)
         Files.createDirectories(testDir)
-        val destinationPath = testDir.resolve(suite.name + (suite.qualifier?.let { "_$it" } ?: "") + ".spt")
+        val destinationPath = testDir.resolve(suite.name + ".spt")
         destinationPath.bufferedWriter().use { writer ->
             generate(suite, writer)
         }
@@ -36,7 +37,7 @@ object SptTestGenerator {
      * @param writer the writer to write to
      */
     fun generate(suite: TestSuite, writer: Writer): Unit = writer.run {
-        writeln("module refret/${suite.name}")
+        writeln("module refret/${suite.directory}/${suite.name}")
         writeParsingTest(suite)
         writeAnalysisTest(suite)
         writeReferenceRetentionTests(suite)
@@ -91,7 +92,7 @@ object SptTestGenerator {
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]
         writeTestContent(suite, listOf(refId, declId), mapOf(refId to case.originalRefText))
-        writeln("]] run fix-reference(|${case.refIndex}, ${case.declIndex}) to [[")
+        writeln("]] run fix-reference(|#${case.refIndex}, #${case.declIndex}) to [[")
         writeTestContent(suite)
         writeln("]]")
     }
@@ -110,16 +111,7 @@ object SptTestGenerator {
         val newText = suite.expectedText.replaceAll(orderedSelections, JavaId::range) { s, t, _ ->
             "[[${replacements[s] ?: t}]]"
         }
-        writeln(newText.trim())
-    }
-
-    /**
-     * Writes a line.
-     *
-     * @param text the line of text to write
-     */
-    private fun Writer.writeln(text: String = "") {
-        write(text)
-        write("\n")
+        write("  ")
+        writeln(newText.prependIndent("  ").trim())
     }
 }

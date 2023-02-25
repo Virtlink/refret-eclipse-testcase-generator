@@ -33,7 +33,7 @@ object TestSuiteReader {
      * @param text the text with markers
      * @return the test suite
      */
-    fun readTestSuite(name: String, qualifier: String?, directory: String, text: String): TestSuite {
+    fun readTestSuite(name: String, directory: String, text: String): TestSuite {
         val refs = mutableListOf<Ref>()
         val decls = mutableListOf<Decl>()
 
@@ -74,7 +74,6 @@ object TestSuiteReader {
 
         return TestSuite(
             name = name,
-            qualifier = qualifier,
             directory = directory,
             expectedText = expectedText,
             identifiers = ids,
@@ -96,7 +95,7 @@ object TestSuiteReader {
          * @return the [JavaId]
          */
         fun toId(start: Int): JavaId {
-            return JavaId(start .. (start + (range.last - range.first)))
+            return JavaId(start until start + replacementText.length)
         }
     }
 

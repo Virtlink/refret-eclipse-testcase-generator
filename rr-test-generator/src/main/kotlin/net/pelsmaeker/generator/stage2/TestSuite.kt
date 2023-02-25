@@ -4,8 +4,6 @@ package net.pelsmaeker.generator.stage2
 data class TestSuite(
     /** The test suite name, such as `testStaticImport5`. */
     val name: String,
-    /** The qualifier for the project, such as `out`; or `null`. */
-    val qualifier: String?,
     /** The directory with the project, such as `RenameStaticMethod`. */
     val directory: String,
     /** The expected text. */
