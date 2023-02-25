@@ -1,3 +1,3 @@
-rootProject.name = "refret-eclipse-testcase-generator-project"
+rootProject.name = "refret-eclipse-testcase-generator"
 
 include(":rr-test-generator")
