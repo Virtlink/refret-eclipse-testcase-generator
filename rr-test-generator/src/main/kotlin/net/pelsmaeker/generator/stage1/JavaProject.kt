@@ -5,8 +5,8 @@ package net.pelsmaeker.generator.stage1
 data class JavaProject(
     /** The name of the project, such as `testStaticImport5`. */
     val name: String,
-    /** The qualifier for the project, such as `out`. */
-    val qualifier: String,
+    /** The qualifier for the project, such as `out`, or `null`. */
+    val qualifier: String?,
     /** The directory with the project, such as `RenameStaticMethod`. */
     val directory: String,
     /** The packages in the project. */

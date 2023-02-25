@@ -8,15 +8,16 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
 import net.pelsmaeker.generator.stage1.EclipseTestFinder
+import net.pelsmaeker.generator.stage1.IntellijTestFinder
 import net.pelsmaeker.generator.stage1.JavaProject
 import net.pelsmaeker.generator.stage1.TestSuiteGenerator
 import java.nio.file.Files
 import java.nio.file.Path
 
 /** Generate basic test suite files command. */
-class DiscoverEclipseCommand: CliktCommand(
-    name = "discover-eclipse",
-    help = "Discovers Eclipse test files"
+class DiscoverIntellijCommand: CliktCommand(
+    name = "discover-intellij",
+    help = "Discovers Intellij test files"
 ) {
 
     /** The input paths. These directories are searched for subdirectories and files. */
@@ -37,7 +38,7 @@ class DiscoverEclipseCommand: CliktCommand(
         // Gather all projects
         val javaProjects = inputs.flatMap { input ->
             Cli.info("Finding test Java projects in: $input")
-            val projects = EclipseTestFinder.findAllJavaProjects(input, input)
+            val projects = IntellijTestFinder.findAllJavaProjects(input, input)
             projects
         }
         Cli.info("Found ${javaProjects.size} test Java projects.")

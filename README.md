@@ -14,21 +14,32 @@ Download/clone this project and build it:
 
 
 ## Usage
-Clone the Eclipse JDI UI repository. We used a specific commit on the `master` branch.
+Clone the Eclipse JDI UI and IntelliJ repositories. We used a specific commit on their main branches.
 
 ```shell
-git clone git@github.com:eclipse-jdt/eclipse.jdt.ui.git
-cd eclipse.jdt.ui
+git clone --recurse-submodules --remote-submodules -j8 --depth=1 git@github.com:eclipse-jdt/eclipse.jdt.ui.git eclipse
+cd eclipse
 git checkout 79766bc97903d157b852359d5084ec6a03935fce
+
+cd ..
+
+git clone --recurse-submodules --remote-submodules -j8 --depth=1 git@github.com:JetBrains/intellij-community.git intellij
+cd intellij
+git checkout f40b4d47bae224d4a1176b8da1c1b6136f1540a0
 ```
 
-From the root of this repository, move to the directory where the tool's invocation script can be found.  Then invoke this tool on the refactoring resources directory, providing also an output directory for the generated test suite Java files.
+From the root of this repository, move to the directory where the tool's invocation script can be found.  Then invoke this tool on the refactoring resources directory of Eclipse and Intellij, providing also an output directory for the generated test suite Java files.
 
 ```shell
 cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
+
 ./rr-test-generator discover-eclipse \
-  eclipse.jdt.ui/org.eclipse.jdt.ui.tests.refactoring/resources  # input directory with refactoring resources
-  --out tests/                                                   # output directory where test suites are placed
+  eclipse/org.eclipse.jdt.ui.tests.refactoring/resources  # input directory with refactoring resources
+  --out eclipse-tests/                                    # output directory where test suites are placed
+
+./rr-test-generator discover-intellij \
+  intellij/java/java-tests/testData/refactoring           # input directory with refactoring resources
+  --out intellij-tests/                                   # output directory where test suites are placed
 ```
 
 Adjust the generated files in `tests/` to have references and declarations. A declaration is a name `x` surrounded by `[[id|x]]`, where `id` is a unique ID you can use to refer to this declaration.  A reference `x` to a declaration with id `id` is similarly written as `[[->id|x|y]]`, where `x` is the reference before reference retention and `y` is the expected reference after performing reference retention.  It is assumed that the program parses correctly in both the _original_ (before) and _expected_ (after) cases, and is semantically correct in the _expected_ (after) case.  For example:
