@@ -92,7 +92,7 @@ object SptTestGenerator {
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]
         writeTestContent(suite, listOf(refId, declId), mapOf(refId to case.originalRefText))
-        writeln("]] run fix-reference(|#${case.refIndex}, #${case.declIndex}) to [[")
+        writeln("]] run fix-reference(|#${case.refIndex + 1}, #${case.declIndex + 1}) to [[")
         writeTestContent(suite)
         writeln("]]")
     }
