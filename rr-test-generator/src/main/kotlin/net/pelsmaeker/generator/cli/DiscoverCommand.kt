@@ -43,7 +43,7 @@ class DiscoverCommand: CliktCommand(
         Cli.info("Generating test suite files in: $output")
         for (javaProject in javaProjects) {
             val dest = TestSuiteGenerator.writeToFile(javaProject, output)
-            Cli.info("Wrote test suite for ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier} to: $dest")
+            Cli.info("  ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier}")
         }
         Cli.info("Generated ${javaProjects.size} test suite files.")
 

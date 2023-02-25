@@ -36,22 +36,22 @@ class Cli(
 
         /** Prints an INFO message to the console. */
         fun info(message: String) {
-            terminal.info(message, whitespace = Whitespace.PRE_LINE)//, overflowWrap = OverflowWrap.BREAK_WORD)
+            terminal.info(message, whitespace = Whitespace.PRE)//, overflowWrap = OverflowWrap.BREAK_WORD)
         }
 
         /** Prints a WARN message to the console. */
         fun warn(message: String) {
-            terminal.warning(message, whitespace = Whitespace.PRE_LINE)//, overflowWrap = OverflowWrap.BREAK_WORD)
+            terminal.warning(message, whitespace = Whitespace.PRE)//, overflowWrap = OverflowWrap.BREAK_WORD)
         }
 
         /** Prints an ERROR message to the console. */
         fun error(message: String) {
-            terminal.danger(message, whitespace = Whitespace.PRE_LINE)//, overflowWrap = OverflowWrap.BREAK_WORD)
+            terminal.danger(message, whitespace = Whitespace.PRE)//, overflowWrap = OverflowWrap.BREAK_WORD)
         }
 
         /** Prints an ERROR message on the console and abort the program by throwing a [ProgramResult] exception. */
         fun fatal(message: String): Nothing {
-            terminal.danger(message, whitespace = Whitespace.PRE_LINE)//, overflowWrap = OverflowWrap.BREAK_WORD)
+            terminal.danger(message, whitespace = Whitespace.PRE)//, overflowWrap = OverflowWrap.BREAK_WORD)
             throw ProgramResult(2)
         }
 

@@ -15,7 +15,7 @@ data class JavaProject(
 
 /** A Java package. */
 data class JavaPackage(
-    /** The name of the package. */
+    /** The name of the package; or an empty string if it has no name. */
     val name: String,
     /** The compilation units in the package. */
     val units: List<JavaUnit>,

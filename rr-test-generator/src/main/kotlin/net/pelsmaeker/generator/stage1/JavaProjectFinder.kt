@@ -29,7 +29,15 @@ object JavaProjectFinder {
             entries.filter { it.isDirectory() }.map { readJavaProjectFromDirectory(it, root) }
         } else if (entries.any { it.name.endsWith("_in.java") } || entries.any { it.name.endsWith("_out.java") }) {
             // If the directory contains one or more files that end in `_in` and `_out`, then each is a java project
-            entries.mapNotNull { readJavaProjectFromFile(it, root) }
+            val entriesAndProjects = entries.map { it to readJavaProjectFromFile(it, root) }
+            val skippedEntries = entriesAndProjects.filter { it.second == null }.map { it.first }
+            if (skippedEntries.isNotEmpty()) {
+                Cli.warn {
+                    "Test suite name could not be determined from file, skipped:\n  " +
+                    skippedEntries.joinToString("\n  ")
+                }
+            }
+            entriesAndProjects.mapNotNull { it.second }
         } else {
             // Recurse if it is a directory.
             entries.filter { it.isDirectory() }.flatMap { entry -> findAllJavaProjects(entry, root) }
@@ -45,19 +53,11 @@ object JavaProjectFinder {
      * @return the Java project; or `null` if it was skipped
      */
     fun readJavaProjectFromFile(file: Path, root: Path): JavaProject? {
-        val testSuiteNames = getTestSuiteName(file.fileName.toString())
-        if (testSuiteNames == null) {
-            Cli.error("Test suite name could not be determined from file, skipped: $file")
-            return null
-        }
+        val testSuiteNames = getTestSuiteName(file.fileName.toString()) ?: return null  // Skipped
         val (unitName, testName, testQualifier) = testSuiteNames
 
         val text = file.readText()
-        val packageName = getPackageName(text)
-        if (packageName == null) {
-            Cli.error("Package name could not be determined from file, skipped: $file")
-            return null
-        }
+        val packageName = getPackageName(text) ?: ""
 
         val pathComponents = root.relativize(file).map { it.toString() }.toList()
         val testDir = pathComponents.dropLast(1).joinToString("/")
@@ -89,11 +89,7 @@ object JavaProjectFinder {
         val packages = mutableMapOf<String, MutableList<JavaUnit>>()
         for (javaFile in javaFiles) {
             val text = javaFile.readText()
-            val packageName = getPackageName(text)
-            if (packageName == null) {
-                Cli.error("Package name could not be determined from file, skipped: $javaFile")
-                continue
-            }
+            val packageName = getPackageName(text) ?: ""
             val unitsInPackage = packages.computeIfAbsent(packageName) { mutableListOf() }
             unitsInPackage.add(JavaUnit(javaFile.fileName.nameWithoutExtension, text))
         }
@@ -114,7 +110,7 @@ object JavaProjectFinder {
     }
 
     /** Regex for finding the package name in a Java file. */
-    private val packageRegex = Regex("""^\s*package\s+([^;]);\s*${'$'}""", RegexOption.MULTILINE)
+    private val packageRegex = Regex("""^\s*package\s+([^;]+);\s*${'$'}""", RegexOption.MULTILINE)
 
     /**
      * Reads the Java package name from the Java code.
@@ -127,7 +123,7 @@ object JavaProjectFinder {
 
 
     /** Regex for matching a test suite file name into a (unitName, testSuiteName, testSuiteQualifier). */
-    private val suiteFilenameRegex = Regex("""^([^_]+)_([^_]+)_([^_]+).java${'$'}""")
+    private val suiteFilenameRegex = Regex("""^([^_\.]+)(?:_([^\.]+))?_(in|out).java${'$'}""")
 
     /**
      * Determines the unit name and test suite name and qualifier.
@@ -137,7 +133,9 @@ object JavaProjectFinder {
      */
     private fun getTestSuiteName(filename: String): Triple<String, String, String>? {
         val match = suiteFilenameRegex.find(filename) ?: return null
-        val (unitName, testSuiteName, testSuiteQualifier) = match.destructured
+        val unitName = match.groups[1]!!.value
+        val testSuiteName = match.groups[2]?.value ?: unitName
+        val testSuiteQualifier = match.groups[3]!!.value
         return Triple(unitName, testSuiteName, testSuiteQualifier)
     }
 }

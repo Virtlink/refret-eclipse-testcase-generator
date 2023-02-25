@@ -35,13 +35,14 @@ object TestSuiteGenerator {
     fun generate(packages: Iterable<JavaPackage>, writer: Writer): Unit = writer.run {
         writeln("test;")
         packages.forEach { pkg ->
-            writeln("[${pkg.name}] {")
+
+            if (pkg.name.isNotBlank()) writeln("[${pkg.name}] {")
             pkg.units.forEach { unit ->
                 writeln("[${unit.name}]")
                 write("  ")
                 writeln(unit.text.prependIndent("  "))
             }
-            writeln("}")
+            if (pkg.name.isNotBlank()) writeln("}")
         }
     }
 

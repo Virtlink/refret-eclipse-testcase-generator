@@ -44,7 +44,7 @@ class GenerateCommand: CliktCommand(
         Cli.info("Generating SPT test files in: $output")
         for (testSuite in testSuites) {
             val dest = SptTestGenerator.writeToFile(testSuite, output)
-            Cli.info("Wrote test suite for ${testSuite.name} to: $dest")
+            Cli.info("  ${testSuite.name}")
         }
         Cli.info("Generated ${testSuites.size} SPT test files.")
 
