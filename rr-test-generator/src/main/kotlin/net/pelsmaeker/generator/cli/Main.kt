@@ -7,7 +7,7 @@ package net.pelsmaeker.generator.cli
  */
 fun main(args: Array<String>) {
     Cli(
-        DiscoverCommand(),
+        DiscoverEclipseCommand(),
         GenerateCommand(),
     ).main(args)
 }

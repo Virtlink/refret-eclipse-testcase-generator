@@ -26,7 +26,7 @@ From the root of this repository, move to the directory where the tool's invocat
 
 ```shell
 cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
-./rr-test-generator discover \
+./rr-test-generator discover-eclipse \
   eclipse.jdt.ui/org.eclipse.jdt.ui.tests.refactoring/resources  # input directory with refactoring resources
   --out tests/                                                   # output directory where test suites are placed
 ```

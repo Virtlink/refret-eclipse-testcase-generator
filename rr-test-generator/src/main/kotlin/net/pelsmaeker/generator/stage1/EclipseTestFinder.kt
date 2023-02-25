@@ -5,7 +5,7 @@ import java.nio.file.Path
 import kotlin.io.path.*
 
 /** Finds Java projects in the Eclipse refactoring test directory. */
-object JavaProjectFinder {
+object EclipseTestFinder {
 
     /**
      * Finds all Java projects in the given directory structure.

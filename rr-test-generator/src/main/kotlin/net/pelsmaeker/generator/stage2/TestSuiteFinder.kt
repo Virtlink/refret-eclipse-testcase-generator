@@ -1,11 +1,8 @@
 package net.pelsmaeker.generator.stage2
 
-import net.pelsmaeker.generator.cli.Cli
-import net.pelsmaeker.generator.stage1.JavaProjectFinder
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
 import kotlin.io.path.readText
 
 /** Finds test suites in the specified directory. */

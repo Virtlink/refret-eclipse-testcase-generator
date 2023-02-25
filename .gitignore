@@ -28,3 +28,8 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 **/build/
+
+
+# Misc
+/eclipse.jdt.ui/
+/intellij-community/

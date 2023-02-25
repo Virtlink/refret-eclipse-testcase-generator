@@ -7,14 +7,15 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.path
-import net.pelsmaeker.generator.stage1.JavaProjectFinder
+import net.pelsmaeker.generator.stage1.EclipseTestFinder
+import net.pelsmaeker.generator.stage1.JavaProject
 import net.pelsmaeker.generator.stage1.TestSuiteGenerator
 import java.nio.file.Files
 import java.nio.file.Path
 
 /** Generate basic test suite files command. */
-class DiscoverCommand: CliktCommand(
-    name = "discover",
+class DiscoverEclipseCommand: CliktCommand(
+    name = "discover-eclipse",
     help = "Discovers Eclipse test files"
 ) {
 
@@ -36,7 +37,7 @@ class DiscoverCommand: CliktCommand(
         // Gather all projects
         val javaProjects = inputs.flatMap { input ->
             Cli.info("Finding test Java projects in: $input")
-            val projects = JavaProjectFinder.findAllJavaProjects(input, input)
+            val projects = EclipseTestFinder.findAllJavaProjects(input, input)
             projects
         }
         Cli.info("Found ${javaProjects.size} test Java projects.")
@@ -47,11 +48,22 @@ class DiscoverCommand: CliktCommand(
 
         // Write each Java project out as a SPT test suite file
         Cli.info("Generating test suite files in: $output")
+        val skippedProjects = mutableListOf<JavaProject>()
         for (javaProject in javaProjects) {
-            TestSuiteGenerator.writeToFile(javaProject, output, force)
-            Cli.info("  ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier}")
+            val path = TestSuiteGenerator.writeToFile(javaProject, output, force)
+            if (path != null) {
+                Cli.info("  ${javaProject.directory}/${javaProject.name}_${javaProject.qualifier}")
+            } else {
+                skippedProjects.add(javaProject)
+            }
         }
-        Cli.info("Generated ${javaProjects.size} test suite files.")
+        if (skippedProjects.isNotEmpty()) {
+            Cli.warn("Skipped generating ${skippedProjects.size} test suite files, because they already exist:")
+            for (skippedProject in skippedProjects) {
+                Cli.warn("  ${skippedProject.directory}/${skippedProject.name}_${skippedProject.qualifier}")
+            }
+        }
+        Cli.info("Generated ${javaProjects.size - skippedProjects.size} test suite files.")
 
         Cli.info("Done!")
     }

@@ -17,14 +17,18 @@ object TestSuiteGenerator {
     /**
      * Writes the Java project as a Test suite in the specified directory.
      *
-     * @return the path to which the file was written
+     * @return the path to which the file was written; or `null` if it was skipped because it already exists
      */
-    fun writeToFile(javaProject: JavaProject, outputDirectory: Path, force: Boolean): Path {
+    fun writeToFile(javaProject: JavaProject, outputDirectory: Path, force: Boolean): Path? {
         val testDir = outputDirectory.resolve(javaProject.directory)
         Files.createDirectories(testDir)
         val destinationPath = testDir.resolve(javaProject.name + "_" + javaProject.qualifier + ".java")
-        destinationPath.overwritingBufferedWriter(force).use { writer ->
-            generate(javaProject.packages, writer)
+        try {
+            destinationPath.overwritingBufferedWriter(force).use { writer ->
+                generate(javaProject.packages, writer)
+            }
+        } catch (ex: java.nio.file.FileAlreadyExistsException) {
+            return null
         }
         return destinationPath
     }
