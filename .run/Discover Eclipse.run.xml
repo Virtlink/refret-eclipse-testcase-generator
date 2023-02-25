@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Discover Eclipse" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="net.pelsmaeker.generator.cli.MainKt" />
+    <module name="refret-eclipse-testcase-generator.rr-test-generator.main" />
+    <option name="PROGRAM_PARAMETERS" value="discover-eclipse eclipse.jdt.ui/org.eclipse.jdt.ui.tests.refactoring/resources --out $PROJECT_DIR$/../refret-evaluation/eclipse/" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
