@@ -63,7 +63,7 @@ object JavaProjectFinder {
         val testDir = pathComponents.dropLast(1).joinToString("/")
 
         return JavaProject(
-            testName,
+            "${unitName}_$testName",
             testQualifier,
             testDir,
             listOf(JavaPackage(
