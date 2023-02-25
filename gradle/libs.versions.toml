@@ -4,18 +4,19 @@ kotlin                          = "1.8.0"           # https://kotlinlang.org/
 gitversion                      = "0.15.0"          # https://github.com/palantir/gradle-git-version
 benmanesVersions                = "0.44.0"          # https://github.com/ben-manes/gradle-versions-plugin
 testlogger                      = "3.2.0"           # https://github.com/radarsh/gradle-test-logger-plugin
+shadow                          = "8.0.0"           # https://imperceptiblethoughts.com/shadow/ (https://github.com/johnrengelman/shadow)
 
 # CLI
 clikt                           = "3.5.1"           # https://ajalt.github.io/clikt/ (https://github.com/ajalt/clikt)
 mordant                         = "2.0.0-beta11"    # https://ajalt.github.io/mordant/ (https://github.com/ajalt/mordant)
 
 # Logging
-kotlinLogging                   = "3.0.5"           # https://github.com/oshai/kotlin-logging
+kotlinLogging                   = "4.0.0-beta-2"    # https://github.com/oshai/kotlin-logging
 logback                         = "1.4.5"           # https://logback.qos.ch/ (https://github.com/qos-ch/logback0
 
 # Testing
 junit                           = "5.9.1"           # https://junit.org
-kotest                          = "5.5.4"           # https://kotest.io/
+kotest                          = "5.5.5"           # https://kotest.io/
 
 
 [plugins]
@@ -23,6 +24,7 @@ kotlin-jvm                      = { id = "org.jetbrains.kotlin.jvm",            
 gitversion                      = { id = "com.palantir.git-version",                                        version.ref = "gitversion" }
 benmanesVersions                = { id = "com.github.ben-manes.versions",                                   version.ref = "benmanesVersions" }
 testlogger                      = { id = "com.adarshr.test-logger",                                         version.ref = "testlogger"}
+shadow                          = { id = "com.github.johnrengelman.shadow",                                 version.ref = "shadow" }
 
 
 [libraries]
