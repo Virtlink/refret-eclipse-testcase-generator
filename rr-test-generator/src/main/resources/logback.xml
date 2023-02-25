@@ -1,0 +1,29 @@
+<configuration debug="false">
+    <!-- Prints minimal output. -->
+    <appender name="console-min" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>[%highlight(%-5level)] %yellow(%date{yyyy-MM-dd HH:mm:ss}){}%seq(%cyan(%mdc{job}){}%magenta(%mdc{runner}){}){'@',' - ',':',' -'} %highlight(%msg){}%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Prints normal output. -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>[%highlight(%-5level)] %yellow(%date{yyyy-MM-dd HH:mm:ss}){} [%cyan(%thread)] %green(%logger{0}){}%seq(%cyan(%mdc{job}){}%magenta(%mdc{runner}){}){'@',' - ',':',' -'} %highlight(%msg){}%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Prints extended output. -->
+    <appender name="console-ext" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder>
+            <pattern>[%highlight(%-5level)] %yellow(%date{ISO8601}){} [%cyan(%thread)] %green(%logger){}%seq(%cyan(%mdc{job}){}%magenta(%mdc{runner}){}){'@',' - ',':',' -'} %highlight(%msg){}%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="TRACE">
+        <appender-ref ref="console" />
+    </root>
+</configuration>
