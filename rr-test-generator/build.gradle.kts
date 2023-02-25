@@ -3,7 +3,9 @@
 plugins {
     java
     `maven-publish`
+    application
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -17,4 +19,12 @@ dependencies {
 
     // Testing
     testImplementation  (libs.kotest)
+}
+
+tasks.shadowJar {
+    archiveFileName.set("labback-docker.${archiveExtension.get()}")
+}
+
+application {
+    mainClass.set("net.pelsmaeker.generator.MainKt")
 }
