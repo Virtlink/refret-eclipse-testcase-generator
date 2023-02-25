@@ -5,6 +5,14 @@ gitversion                      = "0.15.0"          # https://github.com/palanti
 benmanesVersions                = "0.44.0"          # https://github.com/ben-manes/gradle-versions-plugin
 testlogger                      = "3.2.0"           # https://github.com/radarsh/gradle-test-logger-plugin
 
+# CLI
+clikt                           = "3.5.1"           # https://ajalt.github.io/clikt/ (https://github.com/ajalt/clikt)
+mordant                         = "2.0.0-beta11"    # https://ajalt.github.io/mordant/ (https://github.com/ajalt/mordant)
+
+# Logging
+kotlinLogging                   = "3.0.5"           # https://github.com/oshai/kotlin-logging
+logback                         = "1.4.5"           # https://logback.qos.ch/ (https://github.com/qos-ch/logback0
+
 # Testing
 junit                           = "5.9.1"           # https://junit.org
 kotest                          = "5.5.4"           # https://kotest.io/
@@ -18,6 +26,13 @@ testlogger                      = { id = "com.adarshr.test-logger",             
 
 
 [libraries]
+# CLI
+clikt                           = { module = "com.github.ajalt.clikt:clikt",                                version.ref = "clikt" }
+mordant                         = { module = "com.github.ajalt.mordant:mordant",                            version.ref = "mordant" }
+
+# Logging
+kotlinLogging                   = { module = "io.github.microutils:kotlin-logging-jvm",                     version.ref = "kotlinLogging" }
+logback                         = { module = "ch.qos.logback:logback-classic",                              version.ref = "logback" }
 
 # Testing
 junit                           = { module = "org.junit.jupiter:junit-jupiter",                             version.ref = "junit" }

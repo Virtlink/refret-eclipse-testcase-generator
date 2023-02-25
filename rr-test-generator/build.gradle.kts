@@ -7,6 +7,14 @@ plugins {
 }
 
 dependencies {
+    // CLI
+    implementation      (libs.clikt)
+    implementation      (libs.mordant)
+
+    // Logging
+    implementation      (libs.logback)
+    implementation      (libs.kotlinLogging)
+
     // Testing
     testImplementation  (libs.kotest)
 }
