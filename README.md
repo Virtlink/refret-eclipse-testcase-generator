@@ -6,12 +6,58 @@
 Generates SPT test cases from Eclipse unit tests for the Reference Retention paper.
 
 ## Quick Start
-To build the project:
+Download/clone this project and build it:
 
 ```shell
-./gradlew build
+./gradlew installShadowDist
 ```
 
+
+## Usage
+Clone the Eclipse JDI UI repository. We used a specific commit on the `master` branch.
+
+```shell
+git clone git@github.com:eclipse-jdt/eclipse.jdt.ui.git
+cd eclipse.jdt.ui
+git checkout 79766bc97903d157b852359d5084ec6a03935fce
+```
+
+From the root of this repository, move to the directory where the tool's invocation script can be found.  Then invoke this tool on the refactoring resources directory, providing also an output directory for the generated test suite Java files.
+
+```shell
+cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
+./rr-test-generator discover \
+  eclipse.jdt.ui/org.eclipse.jdt.ui.tests.refactoring/resources  # input directory with refactoring resources
+  --out tests/                                                   # output directory where test suites are placed
+```
+
+Adjust the generated files in `tests/` to have references and declarations. A declaration is a name `x` surrounded by `[[id|x]]`, where `id` is a unique ID you can use to refer to this declaration.  A reference `x` to a declaration with id `id` is similarly written as `[[->id|x|y]]`, where `x` is the reference before reference retention and `y` is the expected reference after performing reference retention.  It is assumed that the program parses correctly in both the _original_ (before) and _expected_ (after) cases, and is semantically correct in the _expected_ (after) case.  For example:
+
+```java
+test;
+[p] {
+  [A]
+  package p;
+  class A {
+      int [[1|x]] = 2; // target
+  }
+  class B extends A {
+      int x = 3;
+      class C {
+          int y = [[->1|x|B.super.x]]; // reference
+      }
+  }
+}
+```
+
+Finally, generate SPT tests from the adjusted test suites.  Specify the directory with the test suites as the input argument, and a directory where the SPT tests should be placed as the output argument.
+
+```shell
+cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
+./rr-test-generator generate \
+  tests/                      # input directory with the adjusted test suites
+  --out spttests/             # output directory where the SPT tests are placed
+```
 
 
 ## License
