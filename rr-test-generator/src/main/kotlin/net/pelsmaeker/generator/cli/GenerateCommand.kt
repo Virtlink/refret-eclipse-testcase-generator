@@ -33,6 +33,10 @@ class GenerateCommand: CliktCommand(
     private val force: Boolean by option("-f", "--force", help="Force overwrite of existing files")
         .flag(default = false)
 
+    /** Whether to also include test that have no references/declarations. */
+    private val all: Boolean by option("-a", "--all", help="Include empty tests")
+        .flag(default = false)
+
     override fun run() {
         // Gather all test suites
         val testSuites = inputs.flatMap { input ->
@@ -41,6 +45,12 @@ class GenerateCommand: CliktCommand(
             suites
         }
         Cli.info("Found ${testSuites.size} test suites.")
+        val actualSuites = if (all) testSuites else {
+            testSuites.filter { it.cases.isNotEmpty() }
+        }
+        if (actualSuites.size != testSuites.size) {
+            Cli.warn("Filtered out ${testSuites.size - actualSuites.size} empty test suites.")
+        }
 
         // Ensure the output directory exists
         Cli.info("Creating output directory: $output")
@@ -48,11 +58,11 @@ class GenerateCommand: CliktCommand(
 
         // Write each SPT test out to a file
         Cli.info("Generating SPT test files in: $output")
-        for (testSuite in testSuites) {
+        for (testSuite in actualSuites) {
             SptTestGenerator.writeToFile(testSuite, output, force)
             Cli.info("  ${testSuite.name}")
         }
-        Cli.info("Generated ${testSuites.size} SPT test files.")
+        Cli.info("Generated ${actualSuites.size} SPT test files.")
 
         Cli.info("Done!")
     }
