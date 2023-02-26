@@ -22,7 +22,7 @@ object TestSuiteGenerator {
     fun writeToFile(javaProject: JavaProject, outputDirectory: Path, force: Boolean): Path? {
         val testDir = outputDirectory.resolve(javaProject.directory)
         Files.createDirectories(testDir)
-        val destinationPath = testDir.resolve(javaProject.name + "_" + javaProject.qualifier + ".java")
+        val destinationPath = testDir.resolve(javaProject.name + (javaProject.qualifier?.let { "_$it" } ?: "") + ".java")
         try {
             destinationPath.overwritingBufferedWriter(force).use { writer ->
                 generate(javaProject.packages, writer)

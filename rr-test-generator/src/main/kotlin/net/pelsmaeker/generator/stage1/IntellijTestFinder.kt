@@ -53,17 +53,17 @@ object IntellijTestFinder {
      * @return the Java project; or `null` if it was skipped
      */
     fun readJavaProjectFromFile(file: Path, root: Path): JavaProject? {
-        val testSuiteNames = getTestSuiteName(file.fileName.toString()) ?: return null  // Skipped
-        val (unitName, testName, testQualifier) = testSuiteNames
+        val (testName, testQualifier) = getTestSuiteName(file.fileName.toString()) ?: return null  // Skipped
 
         val text = file.readText()
         val packageName = getPackageName(text) ?: ""
+        val unitName = getUnitName(text) ?: "Test"
 
         val pathComponents = root.relativize(file).map { it.toString() }.toList()
         val testDir = pathComponents.dropLast(1).joinToString("/")
 
         return JavaProject(
-            "${unitName}_$testName",
+            testName,
             testQualifier,
             testDir,
             listOf(JavaPackage(
@@ -114,6 +114,8 @@ object IntellijTestFinder {
 
     /** Regex for finding the package name in a Java file. */
     private val packageRegex = Regex("""^\s*package\s+([^;]+);\s*${'$'}""", RegexOption.MULTILINE)
+    /** Regex for finding the name of the first public class in the Java file. */
+    private val unitRegex = Regex("""^\s*public\s+class\s+(\w+)""", RegexOption.MULTILINE)
 
     /**
      * Reads the Java package name from the Java code.
@@ -124,21 +126,30 @@ object IntellijTestFinder {
         return packageRegex.find(text)?.let { it.groups[1]?.value }
     }
 
+    /**
+     * Reads the name of the first public class in the Java code.
+     *
+     * @return the class name; or `null` if it could not be determined
+     */
+    private fun getUnitName(text: String): String? {
+        return unitRegex.find(text)?.let { it.groups[1]?.value }
+    }
 
-    /** Regex for matching a test suite file name into a (unitName, testSuiteName, testSuiteQualifier). */
-    private val suiteFilenameRegex = Regex("""^([^_\.]+)(?:_([^\.]+))?(?:_(in|out|after))?.java(?:\.(after))?${'$'}""")
 
     /**
      * Determines the unit name and test suite name and qualifier.
      *
      * @param filename the filename to parse
-     * @return the names; or `null` if they could not be determined
+     * @return the name and qualifier; or `null` if they could not be determined
      */
-    private fun getTestSuiteName(filename: String): Triple<String, String, String?>? {
-        val match = suiteFilenameRegex.find(filename) ?: return null
-        val unitName = match.groups[1]!!.value
-        val testSuiteName = match.groups[2]?.value ?: unitName
-        val testSuiteQualifier = match.groups[3]?.value ?: match.groups[4]?.value
-        return Triple(unitName, testSuiteName, testSuiteQualifier)
+    private fun getTestSuiteName(filename: String): Pair<String, String?>? {
+        return when {
+            filename.endsWith("_after.java") -> filename.removeSuffix("_after.java") to "after"
+            filename.endsWith(".java.after") -> filename.removeSuffix(".java.after") to "after"
+            filename.endsWith("_in.java") -> filename.removeSuffix("_in.java") to "in"
+            filename.endsWith("_out.java") -> filename.removeSuffix("_out.java") to "out"
+            filename.endsWith(".java") -> filename.removeSuffix(".java") to null
+            else -> null
+        }
     }
 }
