@@ -52,6 +52,10 @@ object SptTestGenerator {
      */
     private fun Writer.writeParsingTest(suite: TestSuite) {
         writeln()
+        if (suite.isDisabled) {
+            writeln("// [[@disabled]]")
+            return
+        }
         writeln("test parse: ${suite.name} [[")
         writeTestContent(suite)
         writeln("]] parse succeeds")
@@ -64,6 +68,10 @@ object SptTestGenerator {
      */
     private fun Writer.writeAnalysisTest(suite: TestSuite) {
         writeln()
+        if (suite.isDisabled) {
+            writeln("// [[@disabled]]")
+            return
+        }
         writeln("test analysis: ${suite.name} [[")
         writeTestContent(suite)
         writeln("]] run test-analyze to SUCCEED()")
@@ -89,6 +97,10 @@ object SptTestGenerator {
      */
     private fun Writer.writeReferenceRetentionTestCase(suite: TestSuite, case: TestCase, index: Int) {
         writeln()
+        if (suite.isDisabled) {
+            writeln("// [[@disabled]]")
+            return
+        }
         writeln("test refret $index: ${suite.name} [[")
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]

@@ -12,6 +12,8 @@ data class TestSuite(
     val identifiers: List<JavaId>,
     /** The test cases. */
     val cases: List<TestCase>,
+    /** Whether the test suite is disabled. */
+    val isDisabled: Boolean,
 )
 
 /** A test case. */

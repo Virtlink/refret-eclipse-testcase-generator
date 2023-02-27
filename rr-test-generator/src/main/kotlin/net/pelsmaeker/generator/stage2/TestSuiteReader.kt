@@ -17,7 +17,9 @@ import net.pelsmaeker.generator.utils.replaceAll
  */
 object TestSuiteReader {
 
-    private val regex = Regex("""\[\[([^|\]]+)\|([^|\]]+)(?:\|([^|\]]+))?\]\]""")
+    // Annotations: "[[@disabled]]"
+    private val annotationRegex = Regex("""\[\[@([^|\]]+)\]\]""")
+    private val markerRegex = Regex("""\[\[([a-zA-Z0-9\_]+)\|([^|\]]+)(?:\|([^|\]]+))?\]\]""")
 
     /**
      * Reads a test suite from the given text with markers.
@@ -37,7 +39,7 @@ object TestSuiteReader {
         val refs = mutableListOf<Ref>()
         val decls = mutableListOf<Decl>()
 
-        regex.findAll(text).forEach { match ->
+        markerRegex.findAll(text).forEach { match ->
             val range = match.groups[0]!!.range
             val id = match.groups[1]!!.value
             val t = match.groups[2]!!.value
@@ -72,12 +74,17 @@ object TestSuiteReader {
             cases.add(TestCase(refIndex, declIndex, ref.text))
         }
 
+        // Process any annotations
+        val annotations = annotationRegex.findAll(text).map { it.groups[1]!!.value }.toSet()
+        val isDisabled = annotations.contains("disabled")
+
         return TestSuite(
             name = name,
             directory = directory,
             expectedText = expectedText,
             identifiers = ids,
             cases = cases,
+            isDisabled = isDisabled,
         )
     }
 
