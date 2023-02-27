@@ -49,13 +49,11 @@ object SptTestGenerator {
      */
     private fun Writer.writeParsingTest(suite: TestSuite) {
         writeln()
-        if (suite.isDisabled) {
-            writeln("// [[{disabled}]]")
-            return
-        }
+        if (suite.isDisabled) writeln("/*")
         writeln("test ${suite.name}: parsing [[")
         writeTestContent(suite)
         writeln("]] parse succeeds")
+        if (suite.isDisabled) writeln("*/")
     }
 
     /**
@@ -65,18 +63,18 @@ object SptTestGenerator {
      */
     private fun Writer.writeAnalysisTests(suite: TestSuite) {
         writeln()
-        if (suite.isDisabled) {
-            writeln("// [[{disabled}]]")
-            return
-        }
+        if (suite.isDisabled) writeln("/*")
         writeln("test ${suite.name}: default analysis [[")
         writeTestContent(suite)
         writeln("]] analysis succeeds")
+        if (suite.isDisabled) writeln("*/")
 
         writeln()
+        if (suite.isDisabled) writeln("/*")
         writeln("test ${suite.name}: test analysis [[")
         writeTestContent(suite)
         writeln("]] run test-analyze to SUCCEED()")
+        if (suite.isDisabled) writeln("*/")
     }
 
     /**
@@ -98,12 +96,6 @@ object SptTestGenerator {
      * @param suite the test suite
      */
     private fun Writer.writeReferenceRetentionTestCase(suite: TestSuite, case: TestCase, index: Int) {
-        writeln()
-        if (suite.isDisabled) {
-            writeln("// [[{disabled}]]")
-            return
-        }
-
         // Hack to get the indices in the right order.
         val indices = listOf(
             "ref" to case.refIndex,
@@ -120,6 +112,8 @@ object SptTestGenerator {
             }
         }.map { it.first }
 
+        writeln()
+        if (suite.isDisabled) writeln("/*")
         writeln("test ${suite.name}: refret test ${index + 1} [[")
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]
@@ -133,6 +127,7 @@ object SptTestGenerator {
         }
         writeTestContent(suite)
         writeln("]]")
+        if (suite.isDisabled) writeln("*/")
     }
 
     /**
