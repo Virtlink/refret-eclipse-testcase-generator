@@ -2,7 +2,7 @@
   <configuration default="false" name="Generate" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="net.pelsmaeker.generator.cli.MainKt" />
     <module name="refret-eclipse-testcase-generator.rr-test-generator.main" />
-    <option name="PROGRAM_PARAMETERS" value="generate $PROJECT_DIR$/../refret-evaluation/eclipse/ $PROJECT_DIR$/../refret-evaluation/intellij/ --out $PROJECT_DIR$/../java-front/java8.spoofax3/test/refret --force" />
+    <option name="PROGRAM_PARAMETERS" value="generate $PROJECT_DIR$/../refret-evaluation/intellij/ --out $PROJECT_DIR$/../java-front/java8.spoofax3/test/refret --force --module refret/intellij" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />

@@ -17,9 +17,9 @@ import net.pelsmaeker.generator.utils.replaceAll
  */
 object TestSuiteReader {
 
-    // Annotations: "[[@disabled]]"
-    private val annotationRegex = Regex("""\[\[@([^|\]]+)\]\]""")
-    private val markerRegex = Regex("""\[\[([a-zA-Z0-9\_]+)\|([^|\]]+)(?:\|([^|\]]+))?\]\]""")
+    // Annotations: "[[{disabled}]]"
+    private val annotationRegex = Regex("""\[\[\{([^|\]]+)\}\]\]""")
+    private val markerRegex = Regex("""\[\[(->[a-zA-Z0-9\_]+|@[a-zA-Z0-9\_]+)((?:\|[^|\]]+)*)\]\]""")
 
     /**
      * Reads a test suite from the given text with markers.
@@ -41,16 +41,26 @@ object TestSuiteReader {
 
         markerRegex.findAll(text).forEach { match ->
             val range = match.groups[0]!!.range
-            val id = match.groups[1]!!.value
-            val t = match.groups[2]!!.value
-            val et = match.groups[3]?.value ?: t
+            val operator = match.groups[1]!!.value
+            val values = match.groups[2]!!.value.substring(1).split('|')
 
-            if (id.startsWith("->")) {
-                val ref = Ref(id.substring(2).trim(), t, et, range)
-                refs.add(ref)
-            } else {
-                val decl = Decl(id, t, range)
-                decls.add(decl)
+            when {
+                operator.startsWith('@') -> {
+                    // Declaration
+                    val id = operator.substring(1).trim()
+                    val t = if (values.size > 0) values[0] else error("No initial name for reference $operator")
+                    val decl = Decl(id, t, range)
+                    decls.add(decl)
+                }
+                operator.startsWith("->") -> {
+                    // Reference
+                    val id = operator.substring(2).trim()
+                    val t = if (values.size > 0) values[0] else error("No initial name for reference $operator")
+                    val et = if (values.size > 1) values[1] else t
+                    val ref = Ref(id, t, et, range)
+                    refs.add(ref)
+                }
+                else -> error("Unknown operator: $operator")
             }
         }
 
