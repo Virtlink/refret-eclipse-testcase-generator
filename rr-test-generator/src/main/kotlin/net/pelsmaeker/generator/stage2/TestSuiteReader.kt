@@ -19,7 +19,7 @@ object TestSuiteReader {
 
     // Annotations: "[[{disabled}]]"
     private val annotationRegex = Regex("""\[\[\{([^|\]]+)\}\]\]""")
-    private val markerRegex = Regex("""\[\[((?:->|@|&)[^|\]]+)((?:\|[^|\]]+)*)\]\]""")
+    private val markerRegex = Regex("""\[\[([^|\]]+)((?:\|[^|\]]+)*)\]\]""")
 
     /**
      * Reads a test suite from the given text with markers.
@@ -38,12 +38,11 @@ object TestSuiteReader {
     fun readTestSuite(name: String, directory: String, text: String): TestSuite {
         val refs = mutableListOf<Ref>()
         val decls = mutableListOf<Decl>()
-        val contexts = mutableListOf<Context>()
 
         markerRegex.findAll(text).forEach { match ->
             val range = match.groups[0]!!.range
             val operator = match.groups[1]!!.value
-            val values = match.groups[2]!!.value.substring(1).split('|').toMutableList()
+            val values = match.groups[2]!!.value.takeIf { it.isNotBlank() }?.let {it.substring(1).split('|').toMutableList() } ?: mutableListOf()
 
             when {
                 operator.startsWith('@') -> {
@@ -56,21 +55,18 @@ object TestSuiteReader {
                 operator.startsWith("->") -> {
                     // Reference
                     val id = operator.substring(2).trim()
-                    val context = if (values.firstOrNull()?.startsWith("&->") == true) {
+                    val context = if (values.firstOrNull()?.startsWith("&") == true) {
                         // Context specifier
-                        values.removeFirst().substring(3).trim()
+                        values.removeFirst().substring(1).trim()
                     } else null
                     val t = values.removeFirstOrNull() ?: error("No initial name for reference $operator")
                     val et = values.removeFirstOrNull() ?: t
                     val ref = Ref(id, context, t, et, range)
                     refs.add(ref)
                 }
-                operator.startsWith("&") -> {
-                    // Context specifier
-                    val id = operator.substring(1).trim()
-                    val t = values.removeFirstOrNull() ?: error("No name for context $operator")
-                    val context = Context(id, t, range)
-                    contexts.add(context)
+                operator.startsWith("{") -> {
+                    // Annotation
+                    // Ignored
                 }
                 else -> error("Unknown operator: $operator")
             }
@@ -80,9 +76,9 @@ object TestSuiteReader {
         // At the same time, convert the markers to JavaIds and build a list of all identifiers in order from first to last.
         val markerToId = mutableMapOf<Marker, Highlight>()
         val highlights = mutableListOf<Highlight>()
-        val expectedText = text.replaceAll(refs + decls + contexts, { it.range }) { m, _, s ->
+        val expectedText = text.replaceAll(refs + decls, { it.range }) { m, _, s ->
             val id = m.toId(s)
-            markerToId[m] = id
+            markerToId.compute(m) { _, v -> v?.let { error("Duplicate marker: $it") } ?: id }
             highlights.add(id)
             m.replacementText
         }
@@ -91,10 +87,10 @@ object TestSuiteReader {
         val cases = mutableListOf<TestCase>()
         refs.forEach { ref ->
             val decl = decls.firstOrNull { it.id == ref.declId } ?: error("No declaration for reference $ref")
-            val declIndex = highlights.indexOf(markerToId[decl])
-            val refIndex = highlights.indexOf(markerToId[ref])
-            val context = contexts.firstOrNull { it.id == ref.contextId }
-            val contextIndex = context?.let { highlights.indexOf(markerToId[it]) }
+            val declIndex = highlights.indexOf(markerToId[decl]).takeIf { it >= 0 } ?: error("Declaration not found: $decl")
+            val refIndex = highlights.indexOf(markerToId[ref]).takeIf { it >= 0 } ?: error("Reference not found: $ref")
+            val context = ref.contextId?.let { ctxId -> decls.first { it.id == ctxId } }
+            val contextIndex = context?.let { highlights.indexOf(markerToId[it]).takeIf { it >= 0 } ?: error("Context not found: $it") }
             cases.add(TestCase(refIndex, declIndex, contextIndex, ref.text))
         }
 
@@ -136,18 +132,6 @@ object TestSuiteReader {
         }
     }
 
-    /** A context marker. */
-    private data class Context(
-        /** The identifier of the context. */
-        val id: String,
-        /** The text of the context. */
-        val text: String,
-        override val range: IntRange,
-    ): Marker {
-        override val replacementText get() = text
-        override fun toString(): String = "&$id|$text"
-    }
-
     /** A reference marker. */
     private data class Ref(
         /** The identifier of the declaration to which the reference should resolve. */
@@ -163,7 +147,7 @@ object TestSuiteReader {
         override val replacementText get() = expectedText
         override fun toString(): String = StringBuilder().apply {
             append("->$declId")
-            if (contextId != null) append("|&->$contextId")
+            if (contextId != null) append("|&$contextId")
             append("|$text")
             if (text != expectedText) append("|$expectedText")
         }.toString()
