@@ -38,7 +38,7 @@ object SptTestGenerator {
         writeln("module ${if (modulePrefix.isNotBlank()) "$modulePrefix/" else "" }${if (suite.directory.isNotBlank()) "${suite.directory}/" else "" }${suite.name}")
         writeParsingTest(suite)
         writeAnalysisTests(suite)
-//        writeReferenceRetentionTests(suite)
+        writeReferenceRetentionTests(suite)
         writeln()
     }
 
