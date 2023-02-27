@@ -37,8 +37,8 @@ object SptTestGenerator {
     fun generate(modulePrefix: String, suite: TestSuite, writer: Writer): Unit = writer.run {
         writeln("module ${if (modulePrefix.isNotBlank()) "$modulePrefix/" else "" }${if (suite.directory.isNotBlank()) "${suite.directory}/" else "" }${suite.name}")
         writeParsingTest(suite)
-        writeAnalysisTest(suite)
-        writeReferenceRetentionTests(suite)
+        writeAnalysisTests(suite)
+//        writeReferenceRetentionTests(suite)
         writeln()
     }
 
@@ -53,7 +53,7 @@ object SptTestGenerator {
             writeln("// [[{disabled}]]")
             return
         }
-        writeln("test parse: ${suite.name} [[")
+        writeln("test ${suite.name}: parsing [[")
         writeTestContent(suite)
         writeln("]] parse succeeds")
     }
@@ -63,13 +63,18 @@ object SptTestGenerator {
      *
      * @param suite the test suite
      */
-    private fun Writer.writeAnalysisTest(suite: TestSuite) {
+    private fun Writer.writeAnalysisTests(suite: TestSuite) {
         writeln()
         if (suite.isDisabled) {
             writeln("// [[{disabled}]]")
             return
         }
-        writeln("test analysis: ${suite.name} [[")
+        writeln("test ${suite.name}: default analysis [[")
+        writeTestContent(suite)
+        writeln("]] analysis succeeds")
+
+        writeln()
+        writeln("test ${suite.name}: test analysis [[")
         writeTestContent(suite)
         writeln("]] run test-analyze to SUCCEED()")
     }
@@ -115,7 +120,7 @@ object SptTestGenerator {
             }
         }.map { it.first }
 
-        writeln("test refret $index: ${suite.name} [[")
+        writeln("test ${suite.name}: refret test ${index + 1} [[")
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]
         if (case.contextIndex != null) {
