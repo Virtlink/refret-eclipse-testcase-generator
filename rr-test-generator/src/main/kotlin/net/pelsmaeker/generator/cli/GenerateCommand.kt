@@ -3,6 +3,7 @@ package net.pelsmaeker.generator.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -28,6 +29,10 @@ class GenerateCommand: CliktCommand(
     private val output: Path by option("-o", "--out", help="Directory for output directories and files")
         .path(mustExist = false, canBeFile = false, canBeDir = true)
         .required()
+
+    /** The module prefix for SPT tests. */
+    private val modulePrefix: String by option("--module", help="Module prefix for SPT tests")
+        .default("refret")
 
     /** Whether to force overwriting existing generated files. */
     private val force: Boolean by option("-f", "--force", help="Force overwrite of existing files")
@@ -59,7 +64,7 @@ class GenerateCommand: CliktCommand(
         // Write each SPT test out to a file
         Cli.info("Generating SPT test files in: $output")
         for (testSuite in actualSuites) {
-            SptTestGenerator.writeToFile(testSuite, output, force)
+            SptTestGenerator.writeToFile(modulePrefix, testSuite, output, force)
             Cli.info("  ${testSuite.name}")
         }
         Cli.info("Generated ${actualSuites.size} SPT test files.")

@@ -21,12 +21,12 @@ object SptTestGenerator {
      *
      * @return the path to which the file was written
      */
-    fun writeToFile(suite: TestSuite, outputDirectory: Path, force: Boolean): Path {
+    fun writeToFile(modulePrefix: String, suite: TestSuite, outputDirectory: Path, force: Boolean): Path {
         val testDir = outputDirectory.resolve(suite.directory)
         Files.createDirectories(testDir)
         val destinationPath = testDir.resolve(suite.name + ".spt")
         destinationPath.overwritingBufferedWriter(force).use { writer ->
-            generate(suite, writer)
+            generate(modulePrefix, suite, writer)
         }
         return destinationPath
     }
@@ -37,8 +37,8 @@ object SptTestGenerator {
      * @param suite the test suite
      * @param writer the writer to write to
      */
-    fun generate(suite: TestSuite, writer: Writer): Unit = writer.run {
-        writeln("module refret/${suite.directory}/${suite.name}")
+    fun generate(modulePrefix: String, suite: TestSuite, writer: Writer): Unit = writer.run {
+        writeln("module ${if (modulePrefix.isNotBlank()) "$modulePrefix/" else "" }${if (suite.directory.isNotBlank()) "${suite.directory}/" else "" }${suite.name}")
         writeParsingTest(suite)
         writeAnalysisTest(suite)
         writeReferenceRetentionTests(suite)
