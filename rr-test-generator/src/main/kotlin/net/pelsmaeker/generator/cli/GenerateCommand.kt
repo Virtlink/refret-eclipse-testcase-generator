@@ -63,11 +63,15 @@ class GenerateCommand: CliktCommand(
 
         // Write each SPT test out to a file
         Cli.info("Generating SPT test files in: $output")
+        var count = 0
         for (testSuite in actualSuites) {
-            SptTestGenerator.writeToFile(modulePrefix, testSuite, output, force)
+            SptTestGenerator.writeToFile(modulePrefix, "parsing", testSuite, output, force, SptTestGenerator.TestKind.Parsing)
+            SptTestGenerator.writeToFile(modulePrefix, "analysis", testSuite, output, force, SptTestGenerator.TestKind.Analysis)
+            SptTestGenerator.writeToFile(modulePrefix, "refret", testSuite, output, force, SptTestGenerator.TestKind.ReferenceRetention)
+            count += 3
             Cli.info("  ${testSuite.name}")
         }
-        Cli.info("Generated ${actualSuites.size} SPT test files.")
+        Cli.info("Generated $count SPT test files for ${actualSuites.size} tests.")
 
         Cli.info("Done!")
     }
