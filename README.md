@@ -68,6 +68,12 @@ cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
 ./rr-test-generator generate \
   tests/                      # input directory with the adjusted test suites
   --out spttests/             # output directory where the SPT tests are placed
+  
+cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
+./rr-test-generator generate
+  tests/                      # input directory with the adjusted test suites
+  --out spttests/             # output directory where the SPT tests are placed
+  --module spttests/          # module name prefix to use for the SPT tests
 ```
 
 
