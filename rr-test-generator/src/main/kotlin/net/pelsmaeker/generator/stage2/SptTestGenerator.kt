@@ -127,11 +127,10 @@ object SptTestGenerator {
      */
     private fun Writer.writeReferenceRetentionTestCase(suite: TestSuite, case: TestCase, index: Int) {
         // Hack to get the indices in the right order.
-        val indices = listOf(
+        val indices = (listOf(
             "ref" to case.refIndex,
-            "decl" to case.declIndex,
-            "ctx" to case.contextIndex,
-        ).sortedWith { a, b ->
+            "decl" to case.declIndex
+        ) + case.contextIndexes.mapIndexed { i, e -> "ctx$i" to e }).sortedWith { a, b ->
             val a = a.second
             val b = b.second
             when {
@@ -147,10 +146,10 @@ object SptTestGenerator {
         writeln("test ${suite.name}: refret test ${index + 1} [[")
         val refId = suite.identifiers[case.refIndex]
         val declId = suite.identifiers[case.declIndex]
-        if (case.contextIndex != null) {
-            val ctxId = suite.identifiers[case.contextIndex]
-            writeTestContent(suite, listOf(refId, declId, ctxId), mapOf(refId to case.originalRefText))
-            writeln("]] run fix-reference(|#${indices.indexOf("ref") + 1}, #${indices.indexOf("decl") + 1}, #${indices.indexOf("ctx") + 1}) to [[")
+        if (case.contextIndexes.isNotEmpty()) {
+            val ctxIds = case.contextIndexes.map { suite.identifiers[it] }
+            writeTestContent(suite, listOf(refId, declId) + ctxIds, mapOf(refId to case.originalRefText))
+            writeln("]] run fix-reference(|#${indices.indexOf("ref") + 1}, #${indices.indexOf("decl") + 1}, ${List(case.contextIndexes.size) { i -> "#${indices.indexOf("ctx$i") + 1}" }.joinToString(", ")}) to [[")
         } else {
             writeTestContent(suite, listOf(refId, declId), mapOf(refId to case.originalRefText))
             writeln("]] run fix-reference(|#${indices.indexOf("ref") + 1}, #${indices.indexOf("decl") + 1}) to [[")

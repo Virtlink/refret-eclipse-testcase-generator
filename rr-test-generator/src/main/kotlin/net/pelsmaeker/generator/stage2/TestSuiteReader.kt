@@ -55,13 +55,12 @@ object TestSuiteReader {
                 operator.startsWith("->") -> {
                     // Reference
                     val id = operator.substring(2).trim()
-                    val context = if (values.firstOrNull()?.startsWith("&") == true) {
-                        // Context specifier
-                        values.removeFirst().substring(1).trim()
-                    } else null
-                    val t = values.removeFirstOrNull() ?: error("No initial name for reference $operator")
-                    val et = values.removeFirstOrNull() ?: t
-                    val ref = Ref(id, context, t, et, range)
+                    // Context specifiers
+                    val contexts = values.filter { it.startsWith("&") }.map { it.substring(1).trim() }
+                    val otherValues = values.filter { !it.startsWith("&") && !it.startsWith("@") && !it.startsWith("->") }
+                    val t = otherValues.firstOrNull() ?: error("No initial name for reference $operator")
+                    val et = otherValues.drop(1).firstOrNull() ?: t
+                    val ref = Ref(id, contexts, t, et, range)
                     refs.add(ref)
                 }
                 operator.startsWith("{") -> {
@@ -89,9 +88,9 @@ object TestSuiteReader {
             val decl = decls.firstOrNull { it.id == ref.declId } ?: error("No declaration for reference $ref")
             val declIndex = highlights.indexOf(markerToId[decl]).takeIf { it >= 0 } ?: error("Declaration not found: $decl")
             val refIndex = highlights.indexOf(markerToId[ref]).takeIf { it >= 0 } ?: error("Reference not found: $ref")
-            val context = ref.contextId?.let { ctxId -> decls.first { it.id == ctxId } }
-            val contextIndex = context?.let { highlights.indexOf(markerToId[it]).takeIf { it >= 0 } ?: error("Context not found: $it") }
-            cases.add(TestCase(refIndex, declIndex, contextIndex, ref.text))
+            val contexts = ref.contextIds.map { ctxId -> decls.first { it.id == ctxId } }
+            val contextIndexes = contexts.map { highlights.indexOf(markerToId[it]).takeIf { it >= 0 } ?: error("Context not found: $it") }
+            cases.add(TestCase(refIndex, declIndex, contextIndexes, ref.text))
         }
 
         // Process any annotations
@@ -136,8 +135,8 @@ object TestSuiteReader {
     private data class Ref(
         /** The identifier of the declaration to which the reference should resolve. */
         val declId: String,
-        /** The identifier of the context marker. */
-        val contextId: String?,
+        /** The identifiers of the context markers. */
+        val contextIds: List<String>,
         /** The input text of the reference. */
         val text: String,
         /** The expected text of the reference. */
@@ -147,7 +146,7 @@ object TestSuiteReader {
         override val replacementText get() = expectedText
         override fun toString(): String = StringBuilder().apply {
             append("->$declId")
-            if (contextId != null) append("|&$contextId")
+            append(contextIds.joinToString("") { "|&$it" })
             append("|$text")
             if (text != expectedText) append("|$expectedText")
         }.toString()

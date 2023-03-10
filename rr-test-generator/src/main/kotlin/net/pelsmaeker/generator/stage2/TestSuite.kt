@@ -22,8 +22,8 @@ data class TestCase(
     val refIndex: Int,
     /** The zero-based index of a declaration (in [TestSuite.identifiers]) to which the reference should resolve. */
     val declIndex: Int,
-    /** The zero-based index of the context (in [TestSuite.identifiers]) used with the reference, if any; otherwise, `null`. */
-    val contextIndex: Int?,
+    /** The zero-based index of the contexts (in [TestSuite.identifiers]) used with the reference. */
+    val contextIndexes: List<Int>,
     /** The original reference text, that is to be replaced with the expected reference. */
     val originalRefText: String,
 )
