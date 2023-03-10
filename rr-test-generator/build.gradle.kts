@@ -26,5 +26,5 @@ tasks.shadowJar {
 }
 
 application {
-    mainClass.set("net.pelsmaeker.generator.MainKt")
+    mainClass.set("net.pelsmaeker.generator.cli.MainKt")
 }
