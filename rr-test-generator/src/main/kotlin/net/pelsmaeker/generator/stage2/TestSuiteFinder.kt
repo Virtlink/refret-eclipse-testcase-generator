@@ -1,12 +1,13 @@
 package net.pelsmaeker.generator.stage2
 
+import net.pelsmaeker.generator.TestSuite
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 
 /** Finds test suites in the specified directory. */
-object TestSuiteFinder {
+object RefRetTestSuiteFinder {
 
     /**
      * Finds all test suites in the given directory structure.
@@ -15,16 +16,16 @@ object TestSuiteFinder {
      * @param root the root path relative to which the name of the test is determined
      * @return a list of test suites
      */
-    fun findAllTestSuites(directory: Path, root: Path): List<TestSuite> {
+    fun findAll(directory: Path, root: Path): List<TestSuite> {
         val entries = directory.listDirectoryEntries()
 
         return entries.flatMap { entry ->
             if (entry.isDirectory()) {
                 // Recurse if it is a directory.
-                findAllTestSuites(entry, root)
+                findAll(entry, root)
             } else {
                 // Read a test file.
-                listOf(readTestSuiteFromFile(entry, root))
+                listOf(readFromFile(entry, root))
             }
         }
     }
@@ -36,14 +37,14 @@ object TestSuiteFinder {
      * @param root the root path relative to which the name of the test is determined
      * @return the test suite
      */
-    fun readTestSuiteFromFile(file: Path, root: Path): TestSuite {
+    fun readFromFile(file: Path, root: Path): TestSuite {
         val content = file.readText()
 
         val pathComponents = root.relativize(file).map { it.toString() }.toList()
         val testDir = pathComponents.dropLast(1).joinToString("/")
         val testName = pathComponents.last().substringBeforeLast(".java")
 
-        return TestSuiteReader.readTestSuite(
+        return RefRetTestSuiteReader.readRefRetTestSuite(
             testName,
             testDir,
             content,

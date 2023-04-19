@@ -3,14 +3,13 @@ package net.pelsmaeker.generator.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
-import net.pelsmaeker.generator.stage1.TestSuiteGenerator
+import net.pelsmaeker.generator.RefRetTestCase
+import net.pelsmaeker.generator.TestKind
+import net.pelsmaeker.generator.stage2.RefRetTestSuiteFinder
 import net.pelsmaeker.generator.stage2.SptTestGenerator
-import net.pelsmaeker.generator.stage2.TestSuiteFinder
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -42,16 +41,25 @@ class GenerateCommand: CliktCommand(
     private val all: Boolean by option("-a", "--all", help="Include empty tests")
         .flag(default = false)
 
+    /** The kinds of SPT tests to generate. */
+    private val kinds: List<TestKind> by option("-k", "--kind", help="Kind of test to generate")
+        .enum<TestKind>()
+        .multiple(default = listOf(
+            TestKind.Parsing,
+            TestKind.Analysis,
+            TestKind.RefRet,
+        ))
+
     override fun run() {
         // Gather all test suites
         val testSuites = inputs.flatMap { input ->
             Cli.info("Finding test suites in: $input")
-            val suites = TestSuiteFinder.findAllTestSuites(input, input)
+            val suites = RefRetTestSuiteFinder.findAll(input, input)
             suites
         }
         Cli.info("Found ${testSuites.size} test suites.")
         val actualSuites = if (all) testSuites else {
-            testSuites.filter { it.cases.isNotEmpty() }
+            testSuites.filter { it.cases.filterIsInstance<RefRetTestCase>().any() }
         }
         if (actualSuites.size != testSuites.size) {
             Cli.warn("Filtered out ${testSuites.size - actualSuites.size} empty test suites.")
@@ -65,10 +73,10 @@ class GenerateCommand: CliktCommand(
         Cli.info("Generating SPT test files in: $output")
         var count = 0
         for (testSuite in actualSuites) {
-            SptTestGenerator.writeToFile(modulePrefix, "parsing", testSuite, output, force, SptTestGenerator.TestKind.Parsing)
-            SptTestGenerator.writeToFile(modulePrefix, "analysis", testSuite, output, force, SptTestGenerator.TestKind.Analysis)
-            SptTestGenerator.writeToFile(modulePrefix, "refret", testSuite, output, force, SptTestGenerator.TestKind.ReferenceRetention)
-            count += 3
+            for (kind in kinds) {
+                SptTestGenerator.writeToFile(modulePrefix, kind.name.lowercase(), testSuite, output, force, kind)
+                count += 1
+            }
             Cli.info("  ${testSuite.name}")
         }
         Cli.info("Generated $count SPT test files for ${actualSuites.size} tests.")

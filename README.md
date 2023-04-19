@@ -42,7 +42,7 @@ cd rr-test-generator/build/install/rr-test-generator-shadow/bin/
   --out intellij-tests/                                   # output directory where test suites are placed
 ```
 
-Adjust the generated files in `tests/` to have references and declarations. A declaration is a name `x` surrounded by `[[id|x]]`, where `id` is a unique ID you can use to refer to this declaration.  A reference `x` to a declaration with id `id` is similarly written as `[[->id|x|y]]`, where `x` is the reference before reference retention and `y` is the expected reference after performing reference retention.  It is assumed that the program parses correctly in both the _original_ (before) and _expected_ (after) cases, and is semantically correct in the _expected_ (after) case.  For example:
+Adjust the generated files in `tests/` to have references and declarations. A declaration is a name `x` surrounded by `[[@id|x]]`, where `id` is a unique ID you can use to refer to this declaration.  A reference `x` to a declaration with id `id` is similarly written as `[[->id|x|y]]`, where `x` is the reference before reference retention and `y` is the expected reference after performing reference retention.  It is assumed that the program parses correctly in both the _original_ (before) and _expected_ (after) cases, and is semantically correct in the _expected_ (after) case.  For example:
 
 ```java
 test;
@@ -50,7 +50,7 @@ test;
   [A]
   package p;
   class A {
-      int [[1|x]] = 2; // target
+      int [[@1|x]] = 2; // target
   }
   class B extends A {
       int x = 3;
