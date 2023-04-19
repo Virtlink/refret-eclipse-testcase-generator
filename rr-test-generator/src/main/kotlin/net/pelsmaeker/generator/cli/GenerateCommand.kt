@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
 import net.pelsmaeker.generator.RefRetTestCase
 import net.pelsmaeker.generator.TestKind
-import net.pelsmaeker.generator.stage2.RefRetTestSuiteFinder
+import net.pelsmaeker.generator.stage2.RefRetTestSuiteReader
 import net.pelsmaeker.generator.stage2.SptTestGenerator
 import java.nio.file.Files
 import java.nio.file.Path
@@ -16,7 +16,7 @@ import java.nio.file.Path
 /** Generate SPT test files command. */
 class GenerateCommand: CliktCommand(
     name = "generate",
-    help = "Generate SPT test files"
+    help = "Generate reference retention SPT test files"
 ) {
 
     /** The input paths. These directories are searched for subdirectories and files. */
@@ -54,7 +54,7 @@ class GenerateCommand: CliktCommand(
         // Gather all test suites
         val testSuites = inputs.flatMap { input ->
             Cli.info("Finding test suites in: $input")
-            val suites = RefRetTestSuiteFinder.findAll(input, input)
+            val suites = RefRetTestSuiteReader.readAll(input, input)
             suites
         }
         Cli.info("Found ${testSuites.size} test suites.")

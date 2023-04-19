@@ -2,9 +2,13 @@ package net.pelsmaeker.generator.stage2
 
 import net.pelsmaeker.generator.*
 import net.pelsmaeker.generator.utils.replaceAll
+import java.nio.file.Path
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.readText
 
 /**
- * Reads test cases from a file.
+ * Reads reference retention test cases from a file.
  *
  * The file should be a Java file with multiple packages and multiple compilation units (as required by Java SPT tests).
  * Relevant references and declarations should be surrounded by `[[ ... ]]`. A declaration starts with an `'@'` symbol,
@@ -16,11 +20,7 @@ import net.pelsmaeker.generator.utils.replaceAll
  * If the expected name is omitted, it is assumed to be equal to the input name. Whitespace around the names or code is
  * ignored. For example, `[[->1|foo|B.foo]]` is a reference to the declaration `[[@1|foo]]` in class `B`.
  */
-object RefRetTestSuiteReader {
-
-    // Annotations: "[[{disabled}]]"
-    private val annotationRegex = Regex("""\[\[\{([^|\]]+)\}\]\]""")
-    private val markerRegex = Regex("""\[\[([^|\]]+)((?:\|[^|\]]+)*)\]\]""")
+object RefRetTestSuiteReader: TestSuiteReader() {
 
     /**
      * Reads a test suite from the given text with markers.
@@ -36,22 +36,14 @@ object RefRetTestSuiteReader {
      * @param text the text with markers
      * @return the test suite
      */
-    fun readRefRetTestSuite(name: String, directory: String, text: String): TestSuite {
-        val refs = mutableListOf<Ref>()
-        val decls = mutableListOf<Decl>()
-
-        markerRegex.findAll(text).forEach { match ->
-            val range = match.groups[0]!!.range
-            val operator = match.groups[1]!!.value
-            val values = match.groups[2]!!.value.takeIf { it.isNotBlank() }?.let {it.substring(1).split('|').toMutableList() } ?: mutableListOf()
-
+    override fun read(name: String, directory: String, text: String): TestSuite {
+        val markers = readMarkers(text) { range, operator, values ->
             when {
                 operator.startsWith('@') -> {
                     // Declaration
                     val id = operator.substring(1).trim()
-                    val t = values.removeFirstOrNull() ?: error("No name for declaration $operator")
-                    val decl = Decl(id, t, range)
-                    decls.add(decl)
+                    val t = values.firstOrNull() ?: error("No name for declaration $operator")
+                    return@readMarkers Decl(id, t, range)
                 }
                 operator.startsWith("->") -> {
                     // Reference
@@ -61,16 +53,18 @@ object RefRetTestSuiteReader {
                     val otherValues = values.filter { !it.startsWith("&") && !it.startsWith("@") && !it.startsWith("->") }
                     val t = otherValues.firstOrNull() ?: error("No initial name for reference $operator")
                     val et = otherValues.drop(1).firstOrNull() ?: t
-                    val ref = Ref(id, contexts, t, et, range)
-                    refs.add(ref)
+                    return@readMarkers Ref(id, contexts, t, et, range)
                 }
                 operator.startsWith("{") -> {
                     // Annotation
                     // Ignored
+                    return@readMarkers null
                 }
                 else -> error("Unknown operator: $operator")
             }
         }
+        val refs = markers.filterIsInstance<Ref>()
+        val decls = markers.filterIsInstance<Decl>()
 
         // Build the 'expected text' (the code without any markers and with the expected qualified references).
         // At the same time, convert the markers to JavaIds and build a list of all identifiers in order from first to last.
@@ -91,29 +85,23 @@ object RefRetTestSuiteReader {
         val cases = mutableListOf<TestCase>()
 
         // Parser test
-        cases.add(
-            ParseTestCase(
+        cases.add(ParseTestCase(
             "$name: parse test",
             isDisabled,
             expectedText,
-        )
-        )
+        ))
 
         // Analysis tests
-        cases.add(
-            AnalysisTestCase(
+        cases.add(AnalysisTestCase(
             "$name: default analysis",
             isDisabled,
             expectedText,
-        )
-        )
-        cases.add(
-            TestAnalyzeTestCase(
+        ))
+        cases.add(TestAnalyzeTestCase(
             "$name: test analysis",
             isDisabled,
             expectedText,
-        )
-        )
+        ))
 
         // Tests for individual references
         refs.forEachIndexed { i, ref ->
@@ -122,8 +110,7 @@ object RefRetTestSuiteReader {
             val refIndex = highlights.indexOf(markerToId[ref]).takeIf { it >= 0 } ?: error("Reference not found: $ref")
             val contexts = ref.contextIds.map { ctxId -> decls.first { it.id == ctxId } }
             val contextIndexes = contexts.map { highlights.indexOf(markerToId[it]).takeIf { it >= 0 } ?: error("Context not found: $it") }
-            cases.add(
-                RefRetTestCase(
+            cases.add(RefRetTestCase(
                 "$name: refret test ${i + 1}",
                 isDisabled,
                 expectedText,
@@ -132,8 +119,7 @@ object RefRetTestSuiteReader {
                 refIndex,
                 declIndex,
                 contextIndexes,
-            )
-            )
+            ))
         }
 
         // TODO: Do something with the contexts
@@ -144,37 +130,6 @@ object RefRetTestSuiteReader {
             cases = cases,
             isDisabled = isDisabled,
         )
-    }
-
-    private fun <T> MutableList<T>.removeFirstOrNull(): T? {
-        return if (this.isNotEmpty()) this.removeAt(0) else null
-    }
-
-    /** Common interface for markers. */
-    private sealed interface Marker {
-        /** The replacement text for the marker, which is the actual text for a declaration and the expected text for a reference. */
-        val replacementText: String
-        /** The range of the marker in the text. */
-        val range: IntRange
-
-        /**
-         * Converts the marker to a [Highlight].
-         *
-         * @param start the final start index of the marker in the expected text
-         * @return the [Highlight]
-         */
-        fun toIdX(start: Int): Highlight {
-            return Highlight(start until start + replacementText.length)
-        }
-
-        /**
-         * Converts the marker to a [Highlight].
-         *
-         * @param start the final start index of the marker in the expected text
-         * @return the [Highlight]
-         */
-        fun toHighlight(start: Int): Highlight =
-            Highlight(start until start + replacementText.length)
     }
 
     /** A reference marker. */

@@ -151,8 +151,7 @@ data class RefRetTestCase(
             val indices = (listOf(
                 "ref" to refIndex,
                 "decl" to declIndex
-            ) + contextIndexes
-                .mapIndexed { i, e -> "ctx$i" to e })
+            ) + contextIndexes.mapIndexed { i, e -> "ctx$i" to e })
                 .sortedWith { (_, a), (_, b) -> a.compareTo(b) }
                 .map { it.first }
 
@@ -176,4 +175,46 @@ data class RefRetTestCase(
     }
 
     override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.RefRet)
+}
+
+/** 'Move Class' test case. */
+data class TestMoveClassTestCase(
+    /** The name of the test. */
+    override val name: String,
+    /** Whether the test is disabled. */
+    override val isDisabled: Boolean,
+    /** The input content. */
+    override val content: String,
+    /** The expected content. */
+    val expectedContent: String,
+    /** The selections in the input content; ordered from first to last. */
+    val selections: List<Highlight>,
+    /** The zero-based index of a class to move (in [selections]). */
+    val classIndex: Int,
+    /** The zero-based index of a package to move to (in [selections]). */
+    val packageIndex: Int,
+) : TestCase {
+    override fun write(writer: Writer) {
+        writer.apply {
+            // Hack to get the indices in the right order.
+            val indices = listOf(
+                "cls" to classIndex,
+                "pkg" to packageIndex
+            ).sortedWith { (_, a), (_, b) -> a.compareTo(b) }
+                .map { it.first }
+
+            writeln()
+            if (isDisabled) writeln("/*")
+            writeln("test $name [[")
+            val clsId = selections[classIndex]
+            val pkgId = selections[packageIndex]
+            writeTestContent(content, listOf(clsId, pkgId))
+            writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1}) to [[")
+            writeTestContent(expectedContent)
+            writeln("]]")
+            if (isDisabled) writeln("*/")
+        }
+    }
+
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.Analysis)
 }
