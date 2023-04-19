@@ -3,7 +3,6 @@ package net.pelsmaeker.generator.stage2
 import net.pelsmaeker.generator.TestKind
 import net.pelsmaeker.generator.TestSuite
 import net.pelsmaeker.generator.utils.overwritingBufferedWriter
-import net.pelsmaeker.generator.utils.writeTestContent
 import net.pelsmaeker.generator.utils.writeln
 import java.io.Writer
 import java.nio.file.Files

@@ -37,7 +37,7 @@ interface TestCase {
     /** Whether the test is disabled. */
     val isDisabled: Boolean
     /** The input content. */
-    val inputContent: String
+    val content: String
 
     /**
      * Writes the test case to the specified writer.
@@ -62,14 +62,14 @@ data class ParseTestCase(
     /** Whether the test is disabled. */
     override val isDisabled: Boolean,
     /** The input content. */
-    override val inputContent: String,
+    override val content: String,
 ) : TestCase {
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
             if (isDisabled) writeln("/*")
             writeln("test $name [[")
-            writeTestContent(inputContent)
+            writeTestContent(content)
             writeln("]] parse succeeds")
             if (isDisabled) writeln("*/")
         }
@@ -86,14 +86,14 @@ data class AnalysisTestCase(
     /** Whether the test is disabled. */
     override val isDisabled: Boolean,
     /** The input content. */
-    override val inputContent: String,
+    override val content: String,
 ) : TestCase {
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
             if (isDisabled) writeln("/*")
             writeln("test $name [[")
-            writeTestContent(inputContent)
+            writeTestContent(content)
             writeln("]] analysis succeeds")
             if (isDisabled) writeln("*/")
         }
@@ -110,14 +110,14 @@ data class TestAnalyzeTestCase(
     /** Whether the test is disabled. */
     override val isDisabled: Boolean,
     /** The input content. */
-    override val inputContent: String,
+    override val content: String,
 ) : TestCase {
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
             if (isDisabled) writeln("/*")
             writeln("test $name [[")
-            writeTestContent(inputContent)
+            writeTestContent(content)
             writeln("]] run test-analyze to SUCCEED()")
             if (isDisabled) writeln("*/")
         }
@@ -133,7 +133,7 @@ data class RefRetTestCase(
     /** Whether the test is disabled. */
     override val isDisabled: Boolean,
     /** The input content. */
-    override val inputContent: String,
+    override val content: String,
     /** The selections in the input content; ordered from first to last. */
     val selections: List<Highlight>,
     /** The original reference text, that is to be replaced with the expected reference. */
@@ -163,13 +163,13 @@ data class RefRetTestCase(
             val declId = selections[declIndex]
             if (contextIndexes.isNotEmpty()) {
                 val ctxIds = contextIndexes.map { selections[it] }
-                writeTestContent(inputContent, listOf(refId, declId) + ctxIds, mapOf(refId to originalRefText))
+                writeTestContent(content, listOf(refId, declId) + ctxIds, mapOf(refId to originalRefText))
                 writeln("]] run fix-reference(|#${indices.indexOf("ref") + 1}, #${indices.indexOf("decl") + 1}, ${List(contextIndexes.size) { i -> "#${indices.indexOf("ctx$i") + 1}" }.joinToString(", ")}) to [[")
             } else {
-                writeTestContent(inputContent, listOf(refId, declId), mapOf(refId to originalRefText))
+                writeTestContent(content, listOf(refId, declId), mapOf(refId to originalRefText))
                 writeln("]] run fix-reference(|#${indices.indexOf("ref") + 1}, #${indices.indexOf("decl") + 1}) to [[")
             }
-            writeTestContent(inputContent)
+            writeTestContent(content)
             writeln("]]")
             if (isDisabled) writeln("*/")
         }
