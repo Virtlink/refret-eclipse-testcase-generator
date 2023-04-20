@@ -9,7 +9,7 @@ enum class TestKind {
     Parsing,
     Analysis,
     RefRet,
-//    MoveClass,
+    MoveClass,
 }
 
 /** A reference, declaration, or context highlight in the Java source code. */
@@ -38,6 +38,8 @@ interface TestCase {
     val isDisabled: Boolean
     /** The input content. */
     val content: String
+    /** Whether this is a special test case. */
+    val isSpecial: Boolean get() = true
 
     /**
      * Writes the test case to the specified writer.
@@ -64,6 +66,7 @@ data class ParseTestCase(
     /** The input content. */
     override val content: String,
 ) : TestCase {
+    override val isSpecial = false
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
@@ -75,7 +78,8 @@ data class ParseTestCase(
         }
     }
 
-    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.Parsing)
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
+        kinds.isEmpty() || kinds.contains(TestKind.Parsing)
 }
 
 
@@ -88,6 +92,7 @@ data class AnalysisTestCase(
     /** The input content. */
     override val content: String,
 ) : TestCase {
+    override val isSpecial = false
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
@@ -99,7 +104,8 @@ data class AnalysisTestCase(
         }
     }
 
-    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.Analysis)
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
+        kinds.isEmpty() || kinds.contains(TestKind.Analysis)
 }
 
 
@@ -112,6 +118,7 @@ data class TestAnalyzeTestCase(
     /** The input content. */
     override val content: String,
 ) : TestCase {
+    override val isSpecial = false
     override fun write(writer: Writer) {
         writer.apply {
             writeln()
@@ -123,7 +130,8 @@ data class TestAnalyzeTestCase(
         }
     }
 
-    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.Analysis)
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
+        kinds.isEmpty() || kinds.contains(TestKind.Analysis)
 }
 
 /** Reference retention test case. */
@@ -174,7 +182,8 @@ data class RefRetTestCase(
         }
     }
 
-    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.RefRet)
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
+        kinds.isEmpty() || kinds.contains(TestKind.RefRet)
 }
 
 /** 'Move Class' test case. */
@@ -216,5 +225,6 @@ data class TestMoveClassTestCase(
         }
     }
 
-    override fun isAcceptable(kinds: Collection<TestKind>): Boolean = kinds.isEmpty() || kinds.contains(TestKind.Analysis)
+    override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
+        kinds.isEmpty() || kinds.contains(TestKind.MoveClass)
 }

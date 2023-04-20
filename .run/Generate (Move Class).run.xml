@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Generate (RefRet)" type="JetRunConfigurationType">
+  <configuration default="false" name="Generate (Move Class)" type="JetRunConfigurationType">
     <option name="MAIN_CLASS_NAME" value="net.pelsmaeker.generator.cli.MainKt" />
     <module name="refret-eclipse-testcase-generator.rr-test-generator.main" />
-    <option name="PROGRAM_PARAMETERS" value="generate refret $PROJECT_DIR$/../reference-retention-evaluation/intellij/ --out $PROJECT_DIR$/../reference-retention-java/java8.spoofax3/test/refret/intellij/ --force --module refret/intellij" />
+    <option name="PROGRAM_PARAMETERS" value="generate moveclass $PROJECT_DIR$/../reference-retention-evaluation/intellij/moveClass/ --out $PROJECT_DIR$/../reference-retention-java/java8.spoofax3/test/moveclass/intellij/ --force --module moveclass/intellij" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
