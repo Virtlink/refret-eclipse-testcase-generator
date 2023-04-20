@@ -104,7 +104,7 @@ object RefRetTestSuiteReader {
 
         // Parser test
         cases.add(ParseTestCase(
-            "$name: parse test",
+            "$name: parsing",
             isDisabled,
             expectedText,
         ))

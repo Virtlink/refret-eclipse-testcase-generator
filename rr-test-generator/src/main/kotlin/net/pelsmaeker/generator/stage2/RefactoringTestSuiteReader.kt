@@ -100,7 +100,7 @@ object RefactoringTestSuiteReader {
         val moveClassFrom = moveClassAnno.arguments[0]
         val moveClassToPkg = moveClassAnno.arguments[1]
 
-        // Build the 'expected text' (the code without any markers).
+        // Build the 'before text' (the code without any markers).
         // At the same time, convert the relevant markers to Highlights and build a list of all identifiers in order from first to last.
         val markerToId = mutableMapOf<Marker, Highlight>()
         val highlights = mutableListOf<Highlight>()
@@ -112,6 +112,8 @@ object RefactoringTestSuiteReader {
             }
             m.replacementText
         }
+        // Build the 'after text' (the code without any markers).
+        val afterContentWithoutMarkers = afterContent.replaceAll(readMarkers(afterContent), { it.range }) { m, _, _ -> m.replacementText }
 
         // Build the test cases
         val cases = mutableListOf<TestCase>()
@@ -126,7 +128,7 @@ object RefactoringTestSuiteReader {
         cases.add(ParseTestCase(
             "$name: parse 'after' test",
             isDisabled,
-            afterContent,
+            afterContentWithoutMarkers,
         ))
 
         // Analysis tests
@@ -138,7 +140,7 @@ object RefactoringTestSuiteReader {
         cases.add(AnalysisTestCase(
             "$name: default 'after' analysis",
             isDisabled,
-            afterContent,
+            afterContentWithoutMarkers,
         ))
 
         val clsId = decls.firstOrNull { it.id == moveClassFrom } ?: error("No declaration $moveClassFrom")
@@ -149,7 +151,7 @@ object RefactoringTestSuiteReader {
             "$name: move class test",
             isDisabled,
             beforeContentWithoutMarkers,
-            afterContent,
+            afterContentWithoutMarkers,
             highlights,
             clsIndex,
             pkgIndex,
