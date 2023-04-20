@@ -69,7 +69,14 @@ object RefactoringTestSuiteReader {
 
         val pathComponents = root.relativize(beforeFile).map { it.toString() }.toList()
         val testDir = pathComponents.dropLast(1).joinToString("/")
-        val testName = pathComponents.last().substringBeforeLast(".java")
+        // Trick to get the sortest test name without the suffix
+        val testName = pathComponents.last().let {
+            listOf(
+                it.substringBeforeLast(".java"),
+                it.substringBeforeLast("_before.java"),
+                it.substringBeforeLast("_after.java"),
+            )
+        }.minBy { it.length }
 
         return read(
             testName,
