@@ -10,6 +10,7 @@ fun readMarkers(text: String): List<Marker> {
             operator.startsWith('@') -> DeclMarker.read(range, operator, values)
             operator.startsWith("->") -> RefMarker.read(range, operator, values)
             operator.startsWith("{") -> AnnotationMarker.read(range, operator, values)
+            operator.startsWith("#") -> CommentMarker.read(range, operator, values)
             else -> error("Unknown operator: $operator")
         }
     }
@@ -44,6 +45,21 @@ interface Marker {
      */
     fun toHighlight(start: Int): Highlight =
         Highlight(start until start + replacementText.length)
+}
+
+/** A comment marker. */
+data class CommentMarker(
+    override val range: IntRange,
+): Marker {
+    override val replacementText get() = ""
+    override fun toString(): String = "#<comment>"
+
+    companion object {
+        fun read(range: IntRange, operator: String, arguments: List<String>): CommentMarker {
+            assert(operator.startsWith('#'))
+            return CommentMarker(range)
+        }
+    }
 }
 
 /** A reference marker. */
