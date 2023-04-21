@@ -223,7 +223,7 @@ data class TestMoveClassTestCase(
                 writeTestContent(expectedContent)
                 writeln("]]")
             } else {
-                writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1}) succeeds")
+                writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1})")
             }
             if (isDisabled) writeln("*/")
         }
