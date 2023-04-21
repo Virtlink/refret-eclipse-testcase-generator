@@ -155,6 +155,15 @@ object RefactoringTestSuiteReader {
         val clsIndex = highlights.indexOf(markerToId[clsId]).takeIf { it >= 0 } ?: error("Declaration not found: $moveClassFrom")
         val pkgIndex = highlights.indexOf(markerToId[pkgId]).takeIf { it >= 0 } ?: error("Declaration not found: $moveClassToPkg")
         cases.add(TestMoveClassTestCase(
+            "$name: move class test succeeds",
+            isDisabled,
+            beforeContentWithoutMarkers,
+            null,   // succeeds
+            highlights,
+            clsIndex,
+            pkgIndex,
+        ))
+        cases.add(TestMoveClassTestCase(
             "$name: move class test",
             isDisabled,
             beforeContentWithoutMarkers,

@@ -194,8 +194,8 @@ data class TestMoveClassTestCase(
     override val isDisabled: Boolean,
     /** The input content. */
     override val content: String,
-    /** The expected content. */
-    val expectedContent: String,
+    /** The expected content; or `null` to 'succeeds'. */
+    val expectedContent: String?,
     /** The selections in the input content; ordered from first to last. */
     val selections: List<Highlight>,
     /** The zero-based index of a class to move (in [selections]). */
@@ -218,9 +218,13 @@ data class TestMoveClassTestCase(
             val clsId = selections[classIndex]
             val pkgId = selections[packageIndex]
             writeTestContent(content, listOf(clsId, pkgId))
-            writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1}) to [[")
-            writeTestContent(expectedContent)
-            writeln("]]")
+            if (expectedContent != null) {
+                writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1}) to [[")
+                writeTestContent(expectedContent)
+                writeln("]]")
+            } else {
+                writeln("]] run move-class(|#${indices.indexOf("cls") + 1}, #${indices.indexOf("pkg") + 1}) succeeds")
+            }
             if (isDisabled) writeln("*/")
         }
     }
@@ -228,3 +232,4 @@ data class TestMoveClassTestCase(
     override fun isAcceptable(kinds: Collection<TestKind>): Boolean =
         kinds.isEmpty() || kinds.contains(TestKind.MoveClass)
 }
+
