@@ -149,6 +149,16 @@ object RefactoringTestSuiteReader {
             isDisabled,
             afterContentWithoutMarkers,
         ))
+        cases.add(TestAnalyzeTestCase(
+            "$name: default 'before' analysis",
+            isDisabled,
+            beforeContentWithoutMarkers,
+        ))
+        cases.add(TestAnalyzeTestCase(
+            "$name: default 'after' analysis",
+            isDisabled,
+            afterContentWithoutMarkers,
+        ))
 
         val clsId = decls.firstOrNull { it.id == moveClassFrom } ?: error("No declaration $moveClassFrom")
         val pkgId = decls.firstOrNull { it.id == moveClassToPkg } ?: error("No declaration $moveClassToPkg")
